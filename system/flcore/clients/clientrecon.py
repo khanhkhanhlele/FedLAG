@@ -52,3 +52,28 @@ class clientRecon(Client):
         if self.privacy:
             eps, DELTA = get_dp_params(privacy_engine)
             print(f"Client {self.id}", f"epsilon = {eps:.2f}, sigma = {DELTA}")
+
+        print(self._get_layers)
+    def _get_layers(self):
+        """
+        Remove the suffix of the name of the shared layer.
+        Return:
+            The dictionary of shared layers: layer_dict[name]=The list of positions in the shared layers.
+        """
+
+        shared_parameters = self.model.parameters()
+
+        name_list = list(shared_parameters.keys())
+        layers_dict = {}
+        for i, name in enumerate(name_list):
+            if '.weight' in name:
+                name = name.replace('.weight', '')
+            elif '.bias' in name:
+                name = name.replace('.bias', '')
+
+            if name not in layers_dict:
+                layers_dict[name] = [i]
+            else:
+                layers_dict[name].append(i)
+
+        return layers_dict
