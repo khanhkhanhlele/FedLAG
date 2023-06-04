@@ -53,7 +53,7 @@ class clientRecon(Client):
             eps, DELTA = get_dp_params(privacy_engine)
             print(f"Client {self.id}", f"epsilon = {eps:.2f}, sigma = {DELTA}")
 
-        print(self._get_layers)
+        print(self.model.parameters())
     def _get_layers(self):
         """
         Remove the suffix of the name of the shared layer.
