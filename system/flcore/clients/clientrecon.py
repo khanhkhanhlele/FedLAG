@@ -70,7 +70,7 @@ class clientRecon(Client):
 
         model_parameters = self.model.parameters()
 
-        name_list = list(model_parameters)
+        name_list = model_parameters
         print(name_list.shape)
         layers_dict = {}
         for i, name in enumerate(name_list):
