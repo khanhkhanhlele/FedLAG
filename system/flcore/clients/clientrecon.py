@@ -70,7 +70,8 @@ class clientRecon(Client):
 
         model_parameters = self.model.parameters()
 
-        name_list = list(model_parameters.keys())
+        name_list = list(model_parameters)
+        print(name_list.shape)
         layers_dict = {}
         for i, name in enumerate(name_list):
             if '.weight' in name:
