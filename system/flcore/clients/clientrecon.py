@@ -48,9 +48,9 @@ class clientRecon(Client):
                 self.optimizer.zero_grad()
                 loss.backward()
                 print("aaaaaaaaaaaaaaaaaaaaaaaaa")
-                print(loss.grad)
+                print(self.model.weight.grad)
                 print("aaaaaaaaaaaaaaaaaaaaaaaaa")
-                
+                break
                 self.optimizer.step()
 
         # self.model.cpu()
