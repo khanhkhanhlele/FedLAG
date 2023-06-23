@@ -5,6 +5,7 @@ import time
 from flcore.clients.clientbase import Client
 from utils.privacy import *
 from collections import OrderedDict
+import os.path as osp
 
 class clientRecon(Client):
     def __init__(self, args, id, train_samples, test_samples, **kwargs):
@@ -68,10 +69,9 @@ class clientRecon(Client):
             The dictionary of shared layers: layer_dict[name]=The list of positions in the shared layers.
         """
 
-        model_parameters = self.model.parameters()
+        shared_parameters = self.network.shared_parameters()
 
-        name_list = list(model_parameters)
-        print(name_list)
+        name_list = list(shared_parameters.keys())
         layers_dict = {}
         for i, name in enumerate(name_list):
             if '.weight' in name:
@@ -86,12 +86,45 @@ class clientRecon(Client):
 
         return layers_dict
 
+    def cagrad(self, grads, alpha=0.5, rescale=1):
+        """
+        Copy from the implementation of CAGrad: https://github.com/Cranial-XIX/CAGrad
+        """
+        GG = grads.t().mm(grads).cpu()  # [num_tasks, num_tasks]
+        g0_norm = (GG.mean() + 1e-8).sqrt()  # norm of the average gradient
+
+        n_tasks = self.n_tasks
+        x_start = np.ones(n_tasks) / n_tasks
+        bnds = tuple((0, 1) for x in x_start)
+        cons = ({'type': 'eq', 'fun': lambda x: 1 - sum(x)})
+        A = GG.numpy()
+        b = x_start.copy()
+        c = (alpha * g0_norm + 1e-8).item()
+
+        def objfn(x):
+            return (x.reshape(1, n_tasks).dot(A).dot(b.reshape(n_tasks, 1)) + c * np.sqrt(
+                x.reshape(1, n_tasks).dot(A).dot(x.reshape(n_tasks, 1)) + 1e-8)).sum()
+
+        res = minimize(objfn, x_start, bounds=bnds, constraints=cons)
+        w_cpu = res.x
+        ww = torch.Tensor(w_cpu).to(grads.device)
+        gw = (grads * ww.view(1, -1)).sum(1)
+        gw_norm = gw.norm()
+        lmbda = c / (gw_norm + 1e-8)
+        g = grads.mean(1) + lmbda * gw
+        if rescale == 0:
+            return g
+        elif rescale == 1:
+            return g / (1 + alpha ** 2)
+        else:
+            return g / (1 + alpha)
+
     def grad2vec_list(self):
         """
         Get parameter-wise gradients. (weight and bias are not concatenated.)
         """
         grad_list = []
-        for name, param in self.model.parameters().items():
+        for name, param in self.network.shared_parameters().items():
             grad = param.grad
             if grad is not None:
                 grad_cur = grad.data.detach().clone().view(-1)
@@ -156,3 +189,8 @@ class clientRecon(Client):
         self.overwrite_grad(g)
 
         return
+
+    def save(self, path, name, epoch, iterations, seed):
+        saved_dict = {'cos': self.layer_wise_angle}
+        torch.save(saved_dict, osp.join(path, f'{seed}_{self.sub_method}_ep{epoch}_lw_cos.pt'))
+        torch.save(self.network.state_dict(), osp.join(path, f'{seed}_{name}_ep{epoch}_iter{iterations}.pt'))

@@ -2,7 +2,7 @@ import torch
 from torch import Tensor
 import torch.nn as nn
 from typing import Type, Any, Callable, Union, List, Optional
-
+from collections import OrderedDict
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
     """3x3 convolution with padding"""
@@ -211,6 +211,14 @@ class ResNet(nn.Module):
                     nn.init.constant_(m.bn3.weight, 0)  # type: ignore[arg-type]
                 elif isinstance(m, BasicBlock) and m.bn2.weight is not None:
                     nn.init.constant_(m.bn2.weight, 0)  # type: ignore[arg-type]
+        
+        ###### code thêm shared_parameters
+        
+        # define the shared parameters
+        self._shared_parameters = OrderedDict()
+        
+        # get shared parameters
+        self.get_name_of_shared_parameters(layers_branched)
 
     def _make_layer(self, block: BasicBlock, planes: int, blocks: int,
                     stride: int = 1, dilate: bool = False, has_bn=True) -> List:
