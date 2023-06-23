@@ -11,13 +11,13 @@ class clientRecon(Client):
     def __init__(self, args, id, train_samples, test_samples, **kwargs):
         super().__init__(args, id, train_samples, test_samples, **kwargs)
 
-        self.layers_dict = self._get_layers()
-        self.layers_name = list(self.layers_dict.keys())
-        print(self.layers_name)
-        # saved the all cos<g_i, g_j>
-        self.layer_wise_angle = OrderedDict()
-        for name in self.layers_name:
-            self.layer_wise_angle[name] = []
+        # self.layers_dict = self._get_layers()
+        # self.layers_name = list(self.layers_dict.keys())
+        # print(self.layers_name)
+        # # saved the all cos<g_i, g_j>
+        # self.layer_wise_angle = OrderedDict()
+        # for name in self.layers_name:
+        #     self.layer_wise_angle[name] = []
     def train(self):
         trainloader = self.load_train_data()
         # self.model.to(self.device)
@@ -47,6 +47,9 @@ class clientRecon(Client):
                 loss = self.loss(output, y)
                 self.optimizer.zero_grad()
                 loss.backward()
+                data_grad = y.grad.data
+                print(data_grad)
+                break
                 self.optimizer.step()
 
         # self.model.cpu()
