@@ -47,9 +47,7 @@ class clientRecon(Client):
                 loss = self.loss(output, y)
                 self.optimizer.zero_grad()
                 loss.backward()
-                data_grad = x.grad.data
-                print(data_grad)
-                break
+                print(loss.grad)
                 self.optimizer.step()
 
         # self.model.cpu()
