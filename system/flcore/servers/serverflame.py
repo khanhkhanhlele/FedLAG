@@ -91,7 +91,9 @@ class FLAME(Server):
         for i, w in enumerate(self.uploaded_weights):
             self.uploaded_weights[i] = w / tot_samples
             print(i,w)
-        print('-'*25,'x')
-        print(self.uploaded_models)
+        # print('-'*25,'x')
+        # print(self.uploaded_models)
         print('-'*25,'x')
         print(self.uploaded_weights)
+        print('-'*25,'x')
+        print(tot_samples)
