@@ -167,7 +167,7 @@ def run(args):
             args.model = BaseHeadSplit(args.model, args.head)
             server = FedAvg(args, i)
 
-        if args.algorithm == "Recon":
+        elif args.algorithm == "Recon":
             args.head = copy.deepcopy(args.model.fc)
             args.model.fc = nn.Identity()
             args.model = BaseHeadSplit(args.model, args.head)
