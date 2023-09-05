@@ -33,6 +33,7 @@ class FLAME(Server):
 
             for client in self.selected_clients:
                 client.train()
+                print("123")
 
             # threads = [Thread(target=client.train)
             #            for client in self.selected_clients]
