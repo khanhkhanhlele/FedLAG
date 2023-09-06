@@ -174,7 +174,7 @@ def run(args):
             args.model = BaseHeadSplit(args.model, args.head)
             server = Recon(args, i)
         
-        elif args.algorithm == "FLAME":
+        elif args.algorithm == "Flame":
             args.head = copy.deepcopy(args.model.fc)
             args.model.fc = nn.Identity()
             args.model = BaseHeadSplit(args.model, args.head)
