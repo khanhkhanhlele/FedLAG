@@ -2,6 +2,9 @@ import time
 from flcore.clients.clientrecon import clientRecon
 from flcore.servers.serverbase import Server
 from threading import Thread
+import torch
+import torch.nn.functional as F
+from collections import OrderedDict
 
 
 class Recon(Server):
@@ -17,10 +20,15 @@ class Recon(Server):
 
         # self.load_model()
         self.Budget = []
+        self.layers_dict = self.clients[0]._get_layers()
+        self.layers_name = list(self.layers_dict.keys())
+        # saved the all cos<g_i, g_j>
+        self.layer_wise_angle = OrderedDict()
 
 
     def train(self):
         for i in range(self.global_rounds+1):
+            grad_all = []
             s_t = time.time()
             self.selected_clients = self.select_clients()
             self.send_models()
@@ -32,12 +40,27 @@ class Recon(Server):
 
             for client in self.selected_clients:
                 client.train()
-                print("1")
+                grad = client.grad2vec_list()
+                grad = client.__split_layer(grad_list=grad, name_dict=self.layers_dict)
+                grad_all.append(grad)
+                client.network.zero_grad_shared_modules()
+            
+            # The length of the layers
+            length = len(grad_all[0])
 
-            # threads = [Thread(target=client.train)
-            #            for client in self.selected_clients]
-            # [t.start() for t in threads]
-            # [t.join() for t in threads]
+            # get the pair-wise gradients
+            pair_grad = []
+            for i in range(length):
+                temp = []
+                for j in range(self.num_join_clients):
+                    temp.append(grad_all[j][i])
+                temp = torch.stack(temp)
+                pair_grad.append(temp)
+
+            # get all cos<g_i, g_j>
+            for i, pair in enumerate(pair_grad):
+                layer_wise_cos = self.pair_cos(pair).cpu()
+                self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
 
             self.receive_models()
             if self.dlg_eval and i%self.dlg_gap == 0:
@@ -66,3 +89,22 @@ class Recon(Server):
             print(f"\n-------------Fine tuning round-------------")
             print("\nEvaluate new clients")
             self.evaluate()
+            
+    def pair_cos(self, pair):
+        length = pair.size(0)
+
+        dot_value = []
+        for i in range(length - 1):
+            for j in range(i + 1, length):
+                dot_value.append(self.cos(pair[i], pair[j]))
+
+        dot_value = torch.stack(dot_value).view(-1)
+        return dot_value
+    def cos(self, t1, t2):
+        t1 = F.normalize(t1, dim=0)
+        t2 = F.normalize(t2, dim=0)
+
+        dot = (t1 * t2).sum(dim=0)
+
+        return dot
+
