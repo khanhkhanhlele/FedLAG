@@ -56,8 +56,8 @@ class clientRecon(Client):
         if self.privacy:
             eps, DELTA = get_dp_params(privacy_engine)
             print(f"Client {self.id}", f"epsilon = {eps:.2f}, sigma = {DELTA}")
-        self._get_layers[:10]
-        self.grad2vec_list[:10]
+        self._get_layers
+        self.grad2vec_list
 
     def _get_layers(self):
         """
