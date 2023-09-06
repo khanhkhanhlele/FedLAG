@@ -40,9 +40,6 @@ class clientRecon(Client):
                 loss = self.loss(output, y)
                 self.optimizer.zero_grad()
                 loss.backward()
-                for name, param in self.model.named_parameters():
-                    if param.grad is not None:
-                        print(name, param.grad)
                 self.optimizer.step()
 
         # self.model.cpu()
