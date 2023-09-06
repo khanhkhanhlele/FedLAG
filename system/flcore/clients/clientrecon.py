@@ -62,7 +62,7 @@ class clientRecon(Client):
         """
 
         parameters = self.model.parameters()
-
+        print(parameters)
         name_list = list(parameters.keys())
         layers_dict = {}
         for i, name in enumerate(name_list):
