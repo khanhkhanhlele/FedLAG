@@ -61,7 +61,7 @@ class clientRecon(Client):
             The dictionary of shared layers: layer_dict[name]=The list of positions in the shared layers.
         """
 
-        parameters = self.network.parameters()
+        parameters = self.model.parameters()
 
         name_list = list(parameters.keys())
         layers_dict = {}
