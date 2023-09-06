@@ -10,7 +10,6 @@ import os.path as osp
 class clientRecon(Client):
     def __init__(self, args, id, train_samples, test_samples, **kwargs):
         super().__init__(args, id, train_samples, test_samples, **kwargs)
-        self.grad
 
     def train(self):
         trainloader = self.load_train_data()
@@ -57,7 +56,7 @@ class clientRecon(Client):
         if self.privacy:
             eps, DELTA = get_dp_params(privacy_engine)
             print(f"Client {self.id}", f"epsilon = {eps:.2f}, sigma = {DELTA}")
-
+        print(self._get_layers)
 
     def _get_layers(self):
         """
