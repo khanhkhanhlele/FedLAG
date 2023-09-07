@@ -83,7 +83,7 @@ class clientRecon(Client):
         Get parameter-wise gradients. (weight and bias are not concatenated.)
         """
         grad_list = []
-        for name, param in self.model.parameters().items():
+        for name, param in self.model.named_parameters():
             grad = param.grad
             if grad is not None:
                 grad_cur = grad.data.detach().clone().view(-1)
