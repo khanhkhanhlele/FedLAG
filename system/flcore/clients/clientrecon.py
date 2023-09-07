@@ -90,7 +90,7 @@ class clientRecon(Client):
                 grad_list.append(grad_cur)
         return grad_list
 
-    def __split_layer(self, grad_list, name_dict):
+    def split_layer(self, grad_list, name_dict):
         """
         Get the layer-wise gradients. (weight and bias are concatenated.)
         """

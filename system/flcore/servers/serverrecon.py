@@ -41,7 +41,7 @@ class Recon(Server):
             for client in self.selected_clients:
                 client.train()
                 grad = client.grad2vec_list()
-                grad = client.__split_layer(grad_list=grad, name_dict=self.layers_dict)
+                grad = client.split_layer(grad_list=grad, name_dict=self.layers_dict)
                 grad_all.append(grad)
                 client.network.zero_grad_shared_modules()
             
