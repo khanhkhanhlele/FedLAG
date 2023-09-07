@@ -23,7 +23,7 @@ class Recon(Server):
         self.network = self.clients[0].model.cuda()
         self.layers_dict = self.clients[0]._get_layers()
         self.layers_name = list(self.layers_dict.keys())
-        self.grad_dims = self.clients[0]._get_grad_dims()
+        self.grad_dims = self.clients[0].get_grad_dims()
         self.layer_wise_angle = OrderedDict()
         for name in self.layers_name:
             self.layer_wise_angle[name] = []
