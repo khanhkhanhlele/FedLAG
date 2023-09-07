@@ -75,6 +75,7 @@ class Recon(Server):
                 layer_wise_cos = self.pair_cos(pair).cpu()
                 self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
             
+            print(self.network)
             print(self.layer_wise_angle)
             
             self.overwrite_grad(g)
