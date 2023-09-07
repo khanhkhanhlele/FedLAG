@@ -24,6 +24,8 @@ class Recon(Server):
         self.layers_name = list(self.layers_dict.keys())
         # saved the all cos<g_i, g_j>
         self.layer_wise_angle = OrderedDict()
+        for name in self.layers_name:
+            self.layer_wise_angle[name] = []
 
 
     def train(self):
