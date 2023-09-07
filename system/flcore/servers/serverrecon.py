@@ -43,7 +43,7 @@ class Recon(Server):
                 grad = client.grad2vec_list()
                 grad = client.split_layer(grad_list=grad, name_dict=self.layers_dict)
                 grad_all.append(grad)
-                client.network.zero_grad_shared_modules()
+                client.model.zero_grad_shared_modules()
             
             # The length of the layers
             length = len(grad_all[0])
