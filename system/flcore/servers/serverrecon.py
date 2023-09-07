@@ -20,13 +20,20 @@ class Recon(Server):
 
         # self.load_model()
         self.Budget = []
+        self.network = self.clients[0].model.cuda()
         self.layers_dict = self.clients[0]._get_layers()
         self.layers_name = list(self.layers_dict.keys())
-        # saved the all cos<g_i, g_j>
+        self.grad_dims = self.clients[0]._get_grad_dims()
         self.layer_wise_angle = OrderedDict()
         for name in self.layers_name:
             self.layer_wise_angle[name] = []
-
+        self.initilize_grads()
+            
+    def initilize_grads(self):
+        """
+        Initialize the gradients. Need to be called before every training iteration.
+        """
+        self.grads = torch.zeros(sum(self.grad_dims), self.num_join_clients).cuda()
 
     def train(self):
         for i in range(self.global_rounds+1):
@@ -49,6 +56,8 @@ class Recon(Server):
                     if param.grad is not None:
                         param.grad.zero_()
             
+            g = torch.sum(self.grads, dim=1) / self.num_join_clients
+            
             # The length of the layers
             length = len(grad_all[0])
 
@@ -65,7 +74,9 @@ class Recon(Server):
             for i, pair in enumerate(pair_grad):
                 layer_wise_cos = self.pair_cos(pair).cpu()
                 self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
-
+                
+            self.overwrite_grad(g)
+            
             self.receive_models()
             if self.dlg_eval and i%self.dlg_gap == 0:
                 self.call_dlg(i)
@@ -111,4 +122,13 @@ class Recon(Server):
         dot = (t1 * t2).sum(dim=0)
 
         return dot
-
+    
+    def overwrite_grad(self, newgrad):
+        newgrad = newgrad * self.num_join_clients  # to match the sum loss
+        cnt = 0
+        for name, param in self.network.named_parameters():
+            beg = 0 if cnt == 0 else sum(self.grad_dims[:cnt])
+            en = sum(self.grad_dims[:cnt + 1])
+            this_grad = newgrad[beg: en].contiguous().view(param.data.size())
+            param.grad = this_grad.data.clone()
+            cnt += 1

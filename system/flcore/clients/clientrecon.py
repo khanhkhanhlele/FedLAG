@@ -101,3 +101,12 @@ class clientRecon(Client):
             grad_new.append(grad)
 
         return grad_new
+    
+    def get_grad_dims(self):
+        """
+        Get the number of parameters in shared layers.
+        """
+        grad_dims = []
+        for key, param in self.network.named_parameters():
+            grad_dims.append(param.data.numel())
+        return grad_dims
