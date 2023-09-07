@@ -20,10 +20,10 @@ class Recon(Server):
 
         # self.load_model()
         self.Budget = []
-        self.network = self.global_model.cuda()
-        self.layers_dict = self.global_model._get_layers()
+        self.network = self.clients[0].model.cuda()
+        self.layers_dict = self.clients[0]._get_layers()
         self.layers_name = list(self.layers_dict.keys())
-        self.grad_dims = self.global_model.get_grad_dims()
+        self.grad_dims = self.clients[0].get_grad_dims()
         self.layer_wise_angle = OrderedDict()
         for name in self.layers_name:
             self.layer_wise_angle[name] = []
@@ -74,7 +74,9 @@ class Recon(Server):
             for i, pair in enumerate(pair_grad):
                 layer_wise_cos = self.pair_cos(pair).cpu()
                 self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
-                
+            
+            print(self.layer_wise_angle)
+            
             self.overwrite_grad(g)
             
             self.receive_models()
