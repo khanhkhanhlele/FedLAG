@@ -116,7 +116,7 @@ class FLAME(Server):
             self.uploaded_weights[i] = w / tot_samples
         print(self.uploaded_weights)
     
-    def parameters_dict_to_vector_flt(net_dict) -> torch.Tensor:
+    def parameters_dict_to_vector_flt(self, net_dict) -> torch.Tensor:
         vec = []
         for key, param in net_dict.items():
             # print(key, torch.max(param))
