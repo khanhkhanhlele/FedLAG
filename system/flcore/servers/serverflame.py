@@ -50,7 +50,7 @@ class FLAME(Server):
                 
             for param in w_locals:
                 # local_model_vector.append(parameters_dict_to_vector_flt_cpu(param))
-                local_model_vector.append(self.parameters_dict_to_vector_flt(param))
+                local_model_vector.append(parameters_dict_to_vector_flt(param))
             for i in range(len(local_model_vector)):
                 cos_i = []
                 for j in range(len(local_model_vector)):
