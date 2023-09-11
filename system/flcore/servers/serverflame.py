@@ -40,7 +40,7 @@ class FLAME(Server):
             for client in self.selected_clients:
                 idx = client.id
                 client.train()
-                w = client.model.statedict()
+                w = client.model.state_dict()
                 w_locals[idx] = copy.deepcopy(w)
                 print(w)
 
