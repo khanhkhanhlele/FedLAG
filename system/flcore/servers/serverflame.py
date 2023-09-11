@@ -26,6 +26,9 @@ class FLAME(Server):
     def train(self):
         w_glob = self.global_model.state_dict()
         w_locals = [w_glob for i in range(self.num_join_clients)]
+        cos = torch.nn.CosineSimilarity(dim=0, eps=1e-6).cuda()
+        cos_list=[]
+        local_model_vector = []
         
         for i in range(self.global_rounds+1):
             s_t = time.time()
@@ -42,8 +45,19 @@ class FLAME(Server):
                 client.train()
                 w = client.model.state_dict()
                 w_locals[idx] = copy.deepcopy(w)
-                print(w)
-
+                
+            for param in w_locals:
+                # local_model_vector.append(parameters_dict_to_vector_flt_cpu(param))
+                local_model_vector.append(self.parameters_dict_to_vector_flt(param))
+            for i in range(len(local_model_vector)):
+                cos_i = []
+                for j in range(len(local_model_vector)):
+                    cos_ij = 1- cos(local_model_vector[i],local_model_vector[j])
+                    # cos_i.append(round(cos_ij.item(),4))
+                    cos_i.append(cos_ij.item())
+                cos_list.append(cos_i)
+            clusterer = hdbscan.HDBSCAN(min_cluster_size=self.num_join_clients//2 + 1,min_samples=1,allow_single_cluster=True).fit(cos_list)
+            print(clusterer.labels_)
             # threads = [Thread(target=client.train)
             #            for client in self.selected_clients]
             # [t.start() for t in threads]
