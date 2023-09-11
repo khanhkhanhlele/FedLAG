@@ -4,7 +4,10 @@ from flcore.servers.serverbase import Server
 from threading import Thread
 
 import random
-
+import torch
+import numpy as np
+import copy
+import hdbscan
 class FLAME(Server):
     def __init__(self, args, times):
         super().__init__(args, times)
@@ -12,7 +15,7 @@ class FLAME(Server):
         # select slow clients
         self.set_slow_clients()
         self.set_clients(clientFLAME)
-
+        
         print(f"\nJoin ratio / total clients: {self.join_ratio} / {self.num_clients}")
         print("Finished creating server and clients.")
 
@@ -21,6 +24,9 @@ class FLAME(Server):
 
 
     def train(self):
+        w_glob = self.global_model.state_dict()
+        w_locals = [w_glob for i in range(self.num_join_clients)]
+        
         for i in range(self.global_rounds+1):
             s_t = time.time()
             self.selected_clients = self.select_clients()
@@ -32,7 +38,11 @@ class FLAME(Server):
                 self.evaluate()
 
             for client in self.selected_clients:
+                idx = client.id
                 client.train()
+                w = client.model.statedict()
+                w_locals[idx] = copy.deepcopy(w)
+                print(w)
 
             # threads = [Thread(target=client.train)
             #            for client in self.selected_clients]
@@ -91,3 +101,12 @@ class FLAME(Server):
         for i, w in enumerate(self.uploaded_weights):
             self.uploaded_weights[i] = w / tot_samples
         print(self.uploaded_weights)
+    
+    def parameters_dict_to_vector_flt(net_dict) -> torch.Tensor:
+        vec = []
+        for key, param in net_dict.items():
+            # print(key, torch.max(param))
+            if key.split('.')[-1] == 'num_batches_tracked':
+                continue
+            vec.append(param.view(-1))
+        return torch.cat(vec)
