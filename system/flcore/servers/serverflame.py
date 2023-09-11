@@ -115,7 +115,6 @@ class FLAME(Server):
                 self.uploaded_models.append(client.model)
         for i, w in enumerate(self.uploaded_weights):
             self.uploaded_weights[i] = w / tot_samples
-        print(self.uploaded_weights)
     
     def parameters_dict_to_vector_flt(self, net_dict) -> torch.Tensor:
         vec = []
