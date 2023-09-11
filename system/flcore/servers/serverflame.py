@@ -27,10 +27,11 @@ class FLAME(Server):
         w_glob = self.global_model.state_dict()
         w_locals = [w_glob for i in range(self.num_clients)]
         cos = torch.nn.CosineSimilarity(dim=0, eps=1e-6).cuda()
-        cos_list=[]
-        local_model_vector = []
+
         
         for i in range(self.global_rounds+1):
+            cos_list=[]
+            local_model_vector = []
             s_t = time.time()
             self.selected_clients = self.select_clients()
             self.send_models()
