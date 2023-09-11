@@ -1,5 +1,5 @@
 import time
-from flcore.clients.clientavg import clientAVG
+from flcore.clients.clientflame import clientFLAME
 from flcore.servers.serverbase import Server
 from threading import Thread
 
@@ -11,7 +11,7 @@ class FLAME(Server):
 
         # select slow clients
         self.set_slow_clients()
-        self.set_clients(clientAVG)
+        self.set_clients(clientFLAME)
 
         print(f"\nJoin ratio / total clients: {self.join_ratio} / {self.num_clients}")
         print("Finished creating server and clients.")
@@ -63,7 +63,7 @@ class FLAME(Server):
 
         if self.num_new_clients > 0:
             self.eval_new_clients = True
-            self.set_new_clients(clientAVG)
+            self.set_new_clients(clientFLAME)
             print(f"\n-------------Fine tuning round-------------")
             print("\nEvaluate new clients")
             self.evaluate()
