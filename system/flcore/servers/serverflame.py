@@ -27,7 +27,7 @@ class FLAME(Server):
         w_glob = self.global_model.state_dict()
         w_locals = [w_glob for i in range(self.num_clients)]
         cos = torch.nn.CosineSimilarity(dim=0, eps=1e-6).cuda()
-
+        w_updates = []
         
         for i in range(self.global_rounds+1):
             cos_list=[]
@@ -46,6 +46,7 @@ class FLAME(Server):
                 client.train()
                 w = client.model.state_dict()
                 w_locals[idx] = copy.deepcopy(w)
+                w_updates.append(get_update(w, w_glob))
                 
             for param in w_locals:
                 # local_model_vector.append(parameters_dict_to_vector_flt_cpu(param))
@@ -59,6 +60,56 @@ class FLAME(Server):
                 cos_list.append(cos_i)
             clusterer = hdbscan.HDBSCAN(min_cluster_size=self.num_join_clients//2 + 1,min_samples=1,allow_single_cluster=True).fit(cos_list)
             print(clusterer.labels_)
+            
+            benign_client = []
+            norm_list = np.array([])
+
+            max_num_in_cluster=0
+            max_cluster_index=0
+            if clusterer.labels_.max() < 0:
+                for i in range(len(w_locals)):
+                    benign_client.append(i)
+                    norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(w_updates[i]),p=2).item())
+            else:
+                for index_cluster in range(clusterer.labels_.max()+1):
+                    if len(clusterer.labels_[clusterer.labels_==index_cluster]) > max_num_in_cluster:
+                        max_cluster_index = index_cluster
+                        max_num_in_cluster = len(clusterer.labels_[clusterer.labels_==index_cluster])
+                for i in range(len(clusterer.labels_)):
+                    if clusterer.labels_[i] == max_cluster_index:
+                        benign_client.append(i)
+            for i in range(len(local_model_vector)):
+                # norm_list = np.append(norm_list,torch.norm(update_params_vector[i],p=2))  # consider BN
+                norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(w_updates[i]),p=2).item())  # no consider BN
+            print(benign_client)
+        
+            # for i in range(len(benign_client)):
+            #     if benign_client[i] < num_malicious_clients:
+            #         args.wrong_mal+=1
+            #     else:
+            #         #  minus per benign in cluster
+            #         args.right_ben += 1
+            # args.turn+=1
+            # print('proportion of malicious are selected:',args.wrong_mal/(num_malicious_clients*args.turn))
+            # print('proportion of benign are selected:',args.right_ben/(num_benign_clients*args.turn))
+            
+            # clip_value = np.median(norm_list)
+            # for i in range(len(benign_client)):
+            #     gama = clip_value/norm_list[i]
+            #     if gama < 1:
+            #         for key in update_params[benign_client[i]]:
+            #             if key.split('.')[-1] == 'num_batches_tracked':
+            #                 continue
+            #             update_params[benign_client[i]][key] *= gama
+            # global_model = no_defence_balance([update_params[i] for i in benign_client], global_model)
+            # #add noise
+            # for key, var in global_model.items():
+            #     if key.split('.')[-1] == 'num_batches_tracked':
+            #                 continue
+            #     temp = copy.deepcopy(var)
+            #     temp = temp.normal_(mean=0,std=args.noise*clip_value)
+            #     var += temp
+                
             # threads = [Thread(target=client.train)
             #            for client in self.selected_clients]
             # [t.start() for t in threads]
@@ -116,11 +167,35 @@ class FLAME(Server):
         for i, w in enumerate(self.uploaded_weights):
             self.uploaded_weights[i] = w / tot_samples
     
-    def parameters_dict_to_vector_flt(self, net_dict) -> torch.Tensor:
-        vec = []
-        for key, param in net_dict.items():
-            # print(key, torch.max(param))
-            if key.split('.')[-1] == 'num_batches_tracked':
-                continue
-            vec.append(param.view(-1))
-        return torch.cat(vec)
+def parameters_dict_to_vector_flt(net_dict) -> torch.Tensor:
+    vec = []
+    for key, param in net_dict.items():
+        # print(key, torch.max(param))
+        if key.split('.')[-1] == 'num_batches_tracked':
+            continue
+        vec.append(param.view(-1))
+    return torch.cat(vec)
+
+def get_update(update, model):
+    '''get the update weight'''
+    update2 = {}
+    for key, var in update.items():
+        update2[key] = update[key] - model[key]
+    return update2
+
+def parameters_dict_to_vector(net_dict) -> torch.Tensor:
+    r"""Convert parameters to one vector
+
+    Args:
+        parameters (Iterable[Tensor]): an iterator of Tensors that are the
+            parameters of a model.
+
+    Returns:
+        The parameters represented by a single vector
+    """
+    vec = []
+    for key, param in net_dict.items():
+        if key.split('.')[-1] != 'weight' and key.split('.')[-1] != 'bias':
+            continue
+        vec.append(param.view(-1))
+    return torch.cat(vec)
