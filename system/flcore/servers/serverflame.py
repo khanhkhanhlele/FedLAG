@@ -8,7 +8,7 @@ import torch
 import numpy as np
 import copy
 import hdbscan
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, SpectralClustering
 class FLAME(Server):
     def __init__(self, args, times):
         super().__init__(args, times)
@@ -61,7 +61,28 @@ class FLAME(Server):
                     cos_i.append(cos_ij.item())
                 cos_list.append(cos_i)
             
-            clusterer = KMeans(n_clusters=2, random_state=0, n_init='auto').fit(cos_list)
+            # clusterer = KMeans(n_clusters=2, random_state=0, n_init='auto').fit(cos_list)
+            # label_counts = np.bincount(clusterer.labels_)
+            # count_label_0 = label_counts[0]
+            # count_label_1 = label_counts[1]
+            # benign_label = 1
+            # if(count_label_0 >= count_label_1):
+            #     benign_label = 0
+            # print("clusterer_labels:",clusterer.labels_)
+            # benign_client = []
+            # norm_list = np.array([])
+
+            # max_num_in_cluster=0
+            # max_cluster_index=0
+            
+            # if benign_label == 0:
+            #     benign_client = np.where(clusterer.labels_ == 0)[0]
+            #     # norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(update_params[i]),p=2).item())
+            # elif benign_label == 1:
+            #     benign_client = np.where(clusterer.labels_ == 1)[0]
+            # print(benign_client)
+        
+            clusterer = SpectralClustering(n_clusters=2, affinity='nearest_neighbors', random_state=0).fit(cos_list)
             label_counts = np.bincount(clusterer.labels_)
             count_label_0 = label_counts[0]
             count_label_1 = label_counts[1]
@@ -81,6 +102,7 @@ class FLAME(Server):
             elif benign_label == 1:
                 benign_client = np.where(clusterer.labels_ == 1)[0]
             print(benign_client)
+                
         
             # clusterer = hdbscan.HDBSCAN(min_cluster_size=self.num_join_clients//2 + 1,min_samples=1,allow_single_cluster=True).fit(cos_list)
             # print(clusterer.labels_)
