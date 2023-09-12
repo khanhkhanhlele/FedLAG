@@ -26,7 +26,7 @@ class FLAME(Server):
     def train(self):
         
         for i in range(self.global_rounds+1):
-            w_glob = self.global_model
+            w_glob = self.global_model.state_dict()
             w_locals = [w_glob for i in range(self.num_clients)]
             cos = torch.nn.CosineSimilarity(dim=0, eps=1e-6).cuda()
             w_updates = []
