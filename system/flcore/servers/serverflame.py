@@ -115,15 +115,15 @@ class FLAME(Server):
             self.global_model = copy.deepcopy(w_glob)
             print("OK")
                 
-            threads = [Thread(target=client.train)
-                       for client in self.selected_clients]
-            [t.start() for t in threads]
-            [t.join() for t in threads]
+            # threads = [Thread(target=client.train)
+            #            for client in self.selected_clients]
+            # [t.start() for t in threads]
+            # [t.join() for t in threads]
 
-            self.receive_models_flame()
-            if self.dlg_eval and i%self.dlg_gap == 0:
-                self.call_dlg(i)
-            self.aggregate_parameters()
+            # self.receive_models_flame()
+            # if self.dlg_eval and i%self.dlg_gap == 0:
+            #     self.call_dlg(i)
+            # self.aggregate_parameters()
 
             self.Budget.append(time.time() - s_t)
             print('-'*25, 'time cost', '-'*25, self.Budget[-1])
