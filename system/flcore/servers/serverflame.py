@@ -8,6 +8,7 @@ import torch
 import numpy as np
 import copy
 import hdbscan
+from sklearn.cluster import KMeans
 class FLAME(Server):
     def __init__(self, args, times):
         super().__init__(args, times)
@@ -59,6 +60,10 @@ class FLAME(Server):
                     # cos_i.append(round(cos_ij.item(),4))
                     cos_i.append(cos_ij.item())
                 cos_list.append(cos_i)
+            clusterer = KMeans(n_clusters=2).fit(cos_list)
+            labels = clusterer.labels_
+            print(labels)
+            break
             clusterer = hdbscan.HDBSCAN(min_cluster_size=self.num_join_clients//2 + 1,min_samples=1,allow_single_cluster=True).fit(cos_list)
             print(clusterer.labels_)
             
