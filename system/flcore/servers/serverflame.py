@@ -117,7 +117,6 @@ class FLAME(Server):
                 param_b.data.copy_(param_a.data)
                 
             print(self.global_model.parameters())
-            break
                 
             # threads = [Thread(target=client.train)
             #            for client in self.selected_clients]
