@@ -24,12 +24,13 @@ class FLAME(Server):
 
 
     def train(self):
-        w_glob = self.global_model.state_dict()
-        w_locals = [w_glob for i in range(self.num_clients)]
-        cos = torch.nn.CosineSimilarity(dim=0, eps=1e-6).cuda()
-        w_updates = []
         
         for i in range(self.global_rounds+1):
+            w_glob = self.global_model.state_dict()
+            w_locals = [w_glob for i in range(self.num_clients)]
+            cos = torch.nn.CosineSimilarity(dim=0, eps=1e-6).cuda()
+            w_updates = []
+        
             cos_list=[]
             local_model_vector = []
             s_t = time.time()
@@ -93,27 +94,31 @@ class FLAME(Server):
             # print('proportion of malicious are selected:',args.wrong_mal/(num_malicious_clients*args.turn))
             # print('proportion of benign are selected:',args.right_ben/(num_benign_clients*args.turn))
             
-            # clip_value = np.median(norm_list)
-            # for i in range(len(benign_client)):
-            #     gama = clip_value/norm_list[i]
-            #     if gama < 1:
-            #         for key in update_params[benign_client[i]]:
-            #             if key.split('.')[-1] == 'num_batches_tracked':
-            #                 continue
-            #             update_params[benign_client[i]][key] *= gama
-            # global_model = no_defence_balance([update_params[i] for i in benign_client], global_model)
-            # #add noise
-            # for key, var in global_model.items():
-            #     if key.split('.')[-1] == 'num_batches_tracked':
-            #                 continue
-            #     temp = copy.deepcopy(var)
-            #     temp = temp.normal_(mean=0,std=args.noise*clip_value)
-            #     var += temp
+            clip_value = np.median(norm_list)
+            for i in range(len(benign_client)):
+                gama = clip_value/norm_list[i]
+                if gama < 1:
+                    for key in w_updates[benign_client[i]]:
+                        if key.split('.')[-1] == 'num_batches_tracked':
+                            continue
+                        w_updates[benign_client[i]][key] *= gama
+            w_glob = no_defence_balance([w_updates[i] for i in benign_client], w_glob)
+            #add noise
+            for key, var in w_glob.items():
+                if key.split('.')[-1] == 'num_batches_tracked':
+                            continue
+                temp = copy.deepcopy(var)
+                #temp = temp.normal_(mean=0,std=args.noise*clip_value)
+                temp = temp.normal_(mean=0,std=0.001*clip_value)
+                var += temp
                 
-            # threads = [Thread(target=client.train)
-            #            for client in self.selected_clients]
-            # [t.start() for t in threads]
-            # [t.join() for t in threads]
+            self.global_model = copy(w_glob)
+            print("OK")
+                
+            threads = [Thread(target=client.train)
+                       for client in self.selected_clients]
+            [t.start() for t in threads]
+            [t.join() for t in threads]
 
             self.receive_models_flame()
             if self.dlg_eval and i%self.dlg_gap == 0:
@@ -199,3 +204,22 @@ def parameters_dict_to_vector(net_dict) -> torch.Tensor:
             continue
         vec.append(param.view(-1))
     return torch.cat(vec)
+
+def no_defence_balance(params, global_parameters):
+    total_num = len(params)
+    sum_parameters = None
+    for i in range(total_num):
+        if sum_parameters is None:
+            sum_parameters = {}
+            for key, var in params[i].items():
+                sum_parameters[key] = var.clone()
+        else:
+            for var in sum_parameters:
+                sum_parameters[var] = sum_parameters[var] + params[i][var]
+    for var in global_parameters:
+        if var.split('.')[-1] == 'num_batches_tracked':
+            global_parameters[var] = params[0][var]
+            continue
+        global_parameters[var] += (sum_parameters[var] / total_num)
+
+    return global_parameters
