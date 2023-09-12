@@ -5,6 +5,7 @@ from threading import Thread
 import torch
 import torch.nn.functional as F
 from collections import OrderedDict
+import copy
 
 
 class Recon(Server):
@@ -59,8 +60,22 @@ class Recon(Server):
             g = torch.sum(self.grads, dim=1) / self.num_join_clients
             
             # The length of the layers
-            length = len(grad_all[0])
+            length = len(grad_all[0])       # number of layers
 
+            """
+            pair_grad = {
+                Layer 1: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                Layer 2: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                ....
+                Layer L: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+            }
+            """
             # get the pair-wise gradients
             pair_grad = []
             for i in range(length):
@@ -70,20 +85,42 @@ class Recon(Server):
                 temp = torch.stack(temp)
                 pair_grad.append(temp)
 
+            """
+            layer_wise_cos = {
+                Layer 1: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                Layer 2: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                ....
+                Layer L: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+            }
+            """
             # get all cos<g_i, g_j>
             for i, pair in enumerate(pair_grad):
                 layer_wise_cos = self.pair_cos(pair).cpu()
                 self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
-            # print('x'*20)
-            # print(self.network)
-            # print('x'*20)
-            # print(self.layer_wise_angle)
-            
-            self.overwrite_grad(g)
+
+            """ Calculate S-conflict scores for all users """
+            # Loops over all layers
+                # Compute number of cos < 0 -> S
+                # Sum S-conflict scores: np.sum(S)  || Sum over users' layer-wise gradient
+
+            # Top K layers with highest score -> Get index of layers
+
+            # -> Set of conflict layers L1     (K layers with highest scores)
+            # -> Set of non-conflict layers L2 (L-K layers)
+            """  """
             
             self.receive_models()
             if self.dlg_eval and i%self.dlg_gap == 0:
                 self.call_dlg(i)
+
+            # Global Aggregation of round N only non-conflict layers L1
+            # self.aggregate_parameters_recon(L2)
             self.aggregate_parameters()
 
             self.Budget.append(time.time() - s_t)
@@ -136,3 +173,19 @@ class Recon(Server):
             this_grad = newgrad[beg: en].contiguous().view(param.data.size())
             param.grad = this_grad.data.clone()
             cnt += 1
+
+    def aggregate_parameters_recon(self, L2):
+        # L2: 1 list of layer index
+        assert (len(self.uploaded_models) > 0)
+
+        self.global_model = copy.deepcopy(self.uploaded_models[0])
+        for param in self.global_model.parameters():
+            param.data.zero_()
+
+        # for w, client_model in zip(self.uploaded_weights, self.uploaded_models):
+            # for layer in client_model parameters:
+                # if layer is existed in L2:
+                    # self.add_parameters(w, client_model)
+                # else:
+                    # pass
+
