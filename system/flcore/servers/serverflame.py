@@ -59,8 +59,6 @@ class FLAME(Server):
                     # cos_i.append(round(cos_ij.item(),4))
                     cos_i.append(cos_ij.item())
                 cos_list.append(cos_i)
-            print(np.array(cos_list).shape)
-            break
             clusterer = hdbscan.HDBSCAN(min_cluster_size=self.num_join_clients//2 + 1,min_samples=1,allow_single_cluster=True).fit(cos_list)
             print(clusterer.labels_)
             
