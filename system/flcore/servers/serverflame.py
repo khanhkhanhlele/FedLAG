@@ -113,8 +113,9 @@ class FLAME(Server):
                 var += temp
                 
             #self.global_model = copy.deepcopy(w_glob)
-            for a, b in zip(self.global_model.parameters(), w_glob):
-                a.data = b.data.clone() 
+            for param_b, param_a in zip(self.global_model.parameters(), w_glob.values()):
+                param_b.data.copy_(param_a.data)
+                
             print(self.global_model.parameters())
             break
                 
