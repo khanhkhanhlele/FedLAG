@@ -102,9 +102,9 @@ class FLAME(Server):
             #     for i in range(len(clusterer.labels_)):
             #         if clusterer.labels_[i] == max_cluster_index:
             #             benign_client.append(i)
-            # for i in range(len(local_model_vector)):
-            #     # norm_list = np.append(norm_list,torch.norm(update_params_vector[i],p=2))  # consider BN
-            #     norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(w_updates[i]),p=2).item())  # no consider BN
+            for i in range(len(local_model_vector)):
+                # norm_list = np.append(norm_list,torch.norm(update_params_vector[i],p=2))  # consider BN
+                norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(w_updates[i]),p=2).item())  # no consider BN
             # print(benign_client)
         
             # for i in range(len(benign_client)):
