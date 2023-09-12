@@ -115,6 +115,7 @@ class FLAME(Server):
             #self.global_model = copy.deepcopy(w_glob)
             print(w_glob)
             print("OK")
+            print(self.global_model.parameters())
             break
                 
             # threads = [Thread(target=client.train)
