@@ -112,7 +112,7 @@ class FLAME(Server):
                 temp = temp.normal_(mean=0,std=0.001*clip_value)
                 var += temp
                 
-            self.global_model = copy(w_glob)
+            self.global_model = copy.deepcopy(w_glob)
             print("OK")
                 
             threads = [Thread(target=client.train)
