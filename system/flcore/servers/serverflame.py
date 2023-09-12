@@ -61,26 +61,26 @@ class FLAME(Server):
                     cos_i.append(cos_ij.item())
                 cos_list.append(cos_i)
             
-            # clusterer = KMeans(n_clusters=2, random_state=0, n_init='auto').fit(cos_list)
-            # label_counts = np.bincount(clusterer.labels_)
-            # count_label_0 = label_counts[0]
-            # count_label_1 = label_counts[1]
-            # benign_label = 1
-            # if(count_label_0 >= count_label_1):
-            #     benign_label = 0
-            # print("clusterer_labels:",clusterer.labels_)
-            # benign_client = []
-            # norm_list = np.array([])
+            clusterer = KMeans(n_clusters=2, random_state=0, n_init='auto').fit(cos_list)
+            label_counts = np.bincount(clusterer.labels_)
+            count_label_0 = label_counts[0]
+            count_label_1 = label_counts[1]
+            benign_label = 1
+            if(count_label_0 >= count_label_1):
+                benign_label = 0
+            #print("clusterer_labels:",clusterer.labels_)
+            benign_client = []
+            norm_list = np.array([])
 
-            # max_num_in_cluster=0
-            # max_cluster_index=0
+            max_num_in_cluster=0
+            max_cluster_index=0
             
-            # if benign_label == 0:
-            #     benign_client = np.where(clusterer.labels_ == 0)[0]
-            #     # norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(update_params[i]),p=2).item())
-            # elif benign_label == 1:
-            #     benign_client = np.where(clusterer.labels_ == 1)[0]
-            # print(benign_client)
+            if benign_label == 0:
+                benign_client = np.where(clusterer.labels_ == 0)[0]
+                # norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(update_params[i]),p=2).item())
+            elif benign_label == 1:
+                benign_client = np.where(clusterer.labels_ == 1)[0]
+            print(benign_client)
         
             clusterer = SpectralClustering(n_clusters=2, affinity='nearest_neighbors', random_state=0).fit(cos_list)
             label_counts = np.bincount(clusterer.labels_)
@@ -89,7 +89,7 @@ class FLAME(Server):
             benign_label = 1
             if(count_label_0 >= count_label_1):
                 benign_label = 0
-            print("clusterer_labels:",clusterer.labels_)
+            #print("clusterer_labels:",clusterer.labels_)
             benign_client = []
             norm_list = np.array([])
 
@@ -104,30 +104,30 @@ class FLAME(Server):
             print(benign_client)
                 
         
-            # clusterer = hdbscan.HDBSCAN(min_cluster_size=self.num_join_clients//2 + 1,min_samples=1,allow_single_cluster=True).fit(cos_list)
-            # print(clusterer.labels_)
+            clusterer = hdbscan.HDBSCAN(min_cluster_size=self.num_join_clients//2 + 1,min_samples=1,allow_single_cluster=True).fit(cos_list)
+            #print(clusterer.labels_)
             
-            # benign_client = []
-            # norm_list = np.array([])
+            benign_client = []
+            norm_list = np.array([])
 
-            # max_num_in_cluster=0
-            # max_cluster_index=0
-            # if clusterer.labels_.max() < 0:
-            #     for i in range(len(w_locals)):
-            #         benign_client.append(i)
-            #         norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(w_updates[i]),p=2).item())
-            # else:
-            #     for index_cluster in range(clusterer.labels_.max()+1):
-            #         if len(clusterer.labels_[clusterer.labels_==index_cluster]) > max_num_in_cluster:
-            #             max_cluster_index = index_cluster
-            #             max_num_in_cluster = len(clusterer.labels_[clusterer.labels_==index_cluster])
-            #     for i in range(len(clusterer.labels_)):
-            #         if clusterer.labels_[i] == max_cluster_index:
-            #             benign_client.append(i)
+            max_num_in_cluster=0
+            max_cluster_index=0
+            if clusterer.labels_.max() < 0:
+                for i in range(len(w_locals)):
+                    benign_client.append(i)
+                    norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(w_updates[i]),p=2).item())
+            else:
+                for index_cluster in range(clusterer.labels_.max()+1):
+                    if len(clusterer.labels_[clusterer.labels_==index_cluster]) > max_num_in_cluster:
+                        max_cluster_index = index_cluster
+                        max_num_in_cluster = len(clusterer.labels_[clusterer.labels_==index_cluster])
+                for i in range(len(clusterer.labels_)):
+                    if clusterer.labels_[i] == max_cluster_index:
+                        benign_client.append(i)
             for i in range(len(local_model_vector)):
                 # norm_list = np.append(norm_list,torch.norm(update_params_vector[i],p=2))  # consider BN
                 norm_list = np.append(norm_list,torch.norm(parameters_dict_to_vector(w_updates[i]),p=2).item())  # no consider BN
-            # print(benign_client)
+            print(benign_client)
         
             # for i in range(len(benign_client)):
             #     if benign_client[i] < num_malicious_clients:
