@@ -43,12 +43,12 @@
 # ===============================================================horizontal(Cifar10)======================================================================
 
 
-# rm ../dataset/Cifar10/config.json
-# cd ../dataset/
-# nohup python -u generate_cifar10.py noniid - dir > cifar10_dataset.out 2>&1
-# cd ../system/
+rm ../dataset/Cifar10/config.json
+cd ../dataset/
+nohup python -u generate_cifar10.py noniid - dir > cifar10_dataset.out 2>&1
+cd ../system/
 
-# nohup python -u main.py -lbs 16 -nc 20 -jr 1 -nb 10 -data Cifar10 -m dnn -algo FedAvg -gr 2000 -did 0 -go dnn > cifar10_fedavg.out 2>&1 &
+nohup python -u main.py -lbs 16 -nc 20 -jr 1 -nb 10 -data Cifar10 -m dnn -algo FedAvg -gr 2000 -did 0 -go dnn > cifar10_fedavg.out 2>&1 &
 # nohup python -u main.py -lbs 16 -nc 20 -jr 1 -nb 10 -data Cifar10 -m cnn -algo FedAvg -gr 2000 -did 0 -go cnn > cifar10_fedavg1.out 2>&1 &
 # nohup python -u main.py -lbs 16 -nc 20 -jr 1 -nb 10 -data Cifar10 -m resnet -algo FedAvg -gr 2000 -did 0 -go resnet > cifar10_fedavg2.out 2>&1 &
 # # nohup python -u main.py -lbs 16 -nc 20 -jr 1 -nb 10 -data Cifar10 -m dnn -algo FedAvg -gr 2000 -did 0 -cdr 0.5 -go unstable > cifar10_fedavg1.out 2>&1 &
