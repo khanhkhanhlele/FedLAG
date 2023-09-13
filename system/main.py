@@ -392,7 +392,9 @@ if __name__ == "__main__":
     parser.add_argument('-s', "--rand_percent", type=int, default=80)
     parser.add_argument('-p', "--layer_idx", type=int, default=2,
                         help="More fine-graind than its original paper.")
-
+    # Flame
+    parser.add_argument('-cl', "--cluster", type=str, default="kmean",
+                        choices=["hdbscan", "kmean", "spectral" ])
 
     args = parser.parse_args()
 
