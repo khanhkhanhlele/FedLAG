@@ -395,6 +395,9 @@ if __name__ == "__main__":
     # Flame
     parser.add_argument('-cl', "--cluster", type=str, default="kmean",
                         choices=["hdbscan", "kmean", "spectral" ])
+    # Recon
+    parser.add_argument('-es', "--s_score", type=float, default=0)
+    
 
     args = parser.parse_args()
 
