@@ -102,8 +102,6 @@ class Recon(Server):
             """
             # get all cos<g_i, g_j>
             for i, pair in enumerate(pair_grad):
-                print(i)
-                print(pair)
                 layer_wise_cos = self.pair_cos(pair).cpu()
                 self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
             print(self.layer_wise_angle)
