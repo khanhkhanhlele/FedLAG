@@ -110,3 +110,6 @@ class clientRecon(Client):
         for key, param in self.model.named_parameters():
             grad_dims.append(param.data.numel())
         return grad_dims
+    
+    def set_para_from_layer(self, layer):
+        None
