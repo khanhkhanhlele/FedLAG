@@ -26,7 +26,6 @@ class Recon(Server):
         self.layers_name = list(self.layers_dict.keys())
         self.grad_dims = self.clients[0].get_grad_dims()
         self.layer_wise_angle = OrderedDict()
-        
         self.initilize_grads()
         
         self.S_score = OrderedDict()
@@ -146,15 +145,17 @@ class Recon(Server):
             if self.auto_break and self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt):
                 break
         
+        print('-'*30)
         print(self.S_score)
-        
         top_k_items = sorted(self.S_score.items(), key=lambda x: x[1], reverse=True)[:self.top_k]
-        print( top_k_items)
+        top_k_layer = [key for key, _ in top_k_items]
+        print( top_k_layer)
+        print('-'*30)
         
         for i in range(self.mini_rounds+1, self.global_rounds+1):
             s_t = time.time()
             self.selected_clients = self.select_clients()
-            self.send_models()
+            self.send_models_recon(top_k_layer)
 
             if i%self.eval_gap == 0:
                 print(f"\n-------------Round number: {i}-------------")
@@ -239,4 +240,14 @@ class Recon(Server):
                     # self.add_parameters(w, client_model)
                 # else:
                     # pass
+    def send_modes_recon(self, layer):
+        assert (len(self.clients) > 0)
+
+        for client in self.clients:
+            start_time = time.time()
+            
+            client.set_parameters_recon(self.global_model, layer)
+
+            client.send_time_cost['num_rounds'] += 1
+            client.send_time_cost['total_cost'] += 2 * (time.time() - start_time)
 
