@@ -117,7 +117,6 @@ class clientRecon(Client):
         """
         for name, _layer in model.named_modules():
             print(name)
-            print(_layer)
         
         for new_param, old_param in zip(model.parameters(), self.model.parameters()):
             old_param.data = new_param.data.clone()
