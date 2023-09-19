@@ -155,7 +155,7 @@ class Recon(Server):
         for i in range(self.mini_rounds+1, self.global_rounds+1):
             s_t = time.time()
             self.selected_clients = self.select_clients()
-            self.send_models_recon(top_k_layer)
+            self.send_model_recon(top_k_layer)
 
             if i%self.eval_gap == 0:
                 print(f"\n-------------Round number: {i}-------------")
@@ -240,7 +240,7 @@ class Recon(Server):
                     # self.add_parameters(w, client_model)
                 # else:
                     # pass
-    def send_modes_recon(self, layer):
+    def send_model_recon(self, layer):
         assert (len(self.clients) > 0)
 
         for client in self.clients:
