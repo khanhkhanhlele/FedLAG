@@ -44,7 +44,7 @@ class Recon(Server):
         self.grads = torch.zeros(sum(self.grad_dims), self.num_join_clients).cuda()
 
     def train(self):
-        for i in range(self.global_rounds+1):
+        for i in range(self.mini_rounds+1):
             grad_all = []
             s_t = time.time()
             self.selected_clients = self.select_clients()
@@ -67,59 +67,57 @@ class Recon(Server):
                     if param.grad is not None:
                         param.grad.zero_()
             
-            if(i < self.mini_rounds): 
-                # The length of the layers
-                length = len(grad_all[0])       # number of layers
+            # The length of the layers
+            length = len(grad_all[0])       # number of layers
 
-                """
-                pair_grad = {
-                    Layer 1: [
-                        Users 1-2, User 1-3, ... ,User (N-1)-N
-                    ],
-                    Layer 2: [
-                        Users 1-2, User 1-3, ... ,User (N-1)-N
-                    ],
-                    ....
-                    Layer L: [
-                        Users 1-2, User 1-3, ... ,User (N-1)-N
-                    ],
-                }
-                """
-                # get the pair-wise gradients
-                pair_grad = []
-                for i in range(length):
-                    temp = []
-                    for j in range(self.num_join_clients):
-                        temp.append(grad_all[j][i])
-                    temp = torch.stack(temp)
-                    pair_grad.append(temp)
+            """
+            pair_grad = {
+                Layer 1: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                Layer 2: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                ....
+                Layer L: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+            }
+            """
+            # get the pair-wise gradients
+            pair_grad = []
+            for i in range(length):
+                temp = []
+                for j in range(self.num_join_clients):
+                    temp.append(grad_all[j][i])
+                temp = torch.stack(temp)
+                pair_grad.append(temp)
 
-                """
-                layer_wise_cos = {
-                    Layer 1: [
-                        Users 1-2, User 1-3, ... ,User (N-1)-N
-                    ],
-                    Layer 2: [
-                        Users 1-2, User 1-3, ... ,User (N-1)-N
-                    ],
-                    ....
-                    Layer L: [
-                        Users 1-2, User 1-3, ... ,User (N-1)-N
-                    ],
-                }
-                """
-                # get all cos<g_i, g_j>
-                for i, pair in enumerate(pair_grad):
-                    layer_wise_cos = self.pair_cos(pair).cpu()
-                    self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
-                    
-                """ Calculate S-conflict scores for all users """
+            """
+            layer_wise_cos = {
+                Layer 1: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                Layer 2: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+                ....
+                Layer L: [
+                    Users 1-2, User 1-3, ... ,User (N-1)-N
+                ],
+            }
+            """
+            # get all cos<g_i, g_j>
+            for i, pair in enumerate(pair_grad):
+                layer_wise_cos = self.pair_cos(pair).cpu()
+                self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
                 
-                for layer, value in self.layer_wise_angle.items():
-                    count = np.sum([tensor < self.s for tensor in value[0]])
-                    self.S_score[layer] += count
-                
-                print(self.S_score)
+            """ Calculate S-conflict scores for all users """
+            
+            for layer, value in self.layer_wise_angle.items():
+                count = np.sum([tensor < self.s for tensor in value[0]])
+                self.S_score[layer] += count
+            
                     
                 # Loops over all layers
                     # Compute number of cos < 0 -> S
@@ -129,7 +127,7 @@ class Recon(Server):
 
                 # -> Set of conflict layers L1     (K layers with highest scores)
                 # -> Set of non-conflict layers L2 (L-K layers)
-                """  """
+            """  """
             
             # self.overwrite_grad(g)
             
@@ -146,7 +144,8 @@ class Recon(Server):
 
             if self.auto_break and self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt):
                 break
-
+        
+        print(self.S_score)
         print("\nBest accuracy.")
         # self.print_(max(self.rs_test_acc), max(
         #     self.rs_train_acc), min(self.rs_train_loss))
