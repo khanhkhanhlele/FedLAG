@@ -96,7 +96,6 @@ class clientRecon(Client):
         """
         grad_new = []
         for key, value in name_dict.items():
-            print(value)
             grad = [grad_list[i] for i in value]
             grad = torch.cat(grad)
             grad_new.append(grad)

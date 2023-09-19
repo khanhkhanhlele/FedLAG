@@ -61,7 +61,9 @@ class Recon(Server):
             for client in self.selected_clients:
                 client.train()
                 grad = client.grad2vec_list()
+                print(grad)
                 grad = client.split_layer(grad_list=grad, name_dict=self.layers_dict)
+                print(grad)
                 grad_all.append(grad)
                 for param in client.model.parameters():
                     if param.grad is not None:
