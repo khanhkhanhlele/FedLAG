@@ -117,8 +117,10 @@ class Recon(Server):
             """ Calculate S-conflict scores for all users """
             
             for value in self.layer_wise_angle.values():
-                count = np.sum([tensor > self.s_score for tensor in value])
-                print(count)
+                print(value)
+                # count = np.sum([tensor > self.s_score for tensor in value])
+                # print(count)
+                
             # Loops over all layers
                 # Compute number of cos < 0 -> S
                 # Sum S-conflict scores: np.sum(S)  || Sum over users' layer-wise gradient
