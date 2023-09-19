@@ -26,8 +26,7 @@ class Recon(Server):
         self.layers_name = list(self.layers_dict.keys())
         self.grad_dims = self.clients[0].get_grad_dims()
         self.layer_wise_angle = OrderedDict()
-        for name in self.layers_name:
-            self.layer_wise_angle[name] = []
+        
         self.initilize_grads()
         
         self.s_score = args.s_score
@@ -46,6 +45,9 @@ class Recon(Server):
             s_t = time.time()
             self.selected_clients = self.select_clients()
             self.send_models()
+            
+            for name in self.layers_name:
+                self.layer_wise_angle[name] = []
 
             if i%self.eval_gap == 0:
                 print(f"\n-------------Round number: {i}-------------")
@@ -118,8 +120,8 @@ class Recon(Server):
             
             for value in self.layer_wise_angle.values():
                 print(value)
-                # count = np.sum([tensor > self.s_score for tensor in value])
-                # print(count)
+                count = np.sum([tensor > self.s_score for tensor in value[0]])
+                print(count)
                 
             # Loops over all layers
                 # Compute number of cos < 0 -> S
