@@ -115,7 +115,7 @@ class Recon(Server):
                     
                 """ Calculate S-conflict scores for all users """
                 
-                for layer, value in self.layer_wise_angle.item():
+                for layer, value in self.layer_wise_angle.items():
                     count = np.sum([tensor < self.s for tensor in value[0]])
                     self.S_score[layer] += count
                 
