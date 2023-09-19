@@ -30,6 +30,8 @@ class Recon(Server):
         self.initilize_grads()
         
         self.s_score = args.s_score
+        #self.sub_method = args.sub_method
+        self.mini_rounds = args.mini_rounds
             
     def initilize_grads(self):
         """
@@ -58,7 +60,13 @@ class Recon(Server):
                     if param.grad is not None:
                         param.grad.zero_()
             
-            g = torch.sum(self.grads, dim=1) / self.num_join_clients
+            # get the update gradient after gradient manipulation
+            # if self.sub_method == 'Baseline':
+            #     g = torch.sum(self.grads, dim=1) / self.num_clients
+            # elif self.sub_method == 'CAGrad':
+            #     g = self.cagrad(self.grads, self.num_clients, rescale=1)
+            # else:
+            #     raise NotImplementedError
             
             # The length of the layers
             length = len(grad_all[0])       # number of layers
@@ -104,9 +112,10 @@ class Recon(Server):
             for i, pair in enumerate(pair_grad):
                 layer_wise_cos = self.pair_cos(pair).cpu()
                 self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
-            print(self.layer_wise_angle)
-            break
+                
             """ Calculate S-conflict scores for all users """
+            
+            print(self.layer_wise_angle[0])
             # Loops over all layers
                 # Compute number of cos < 0 -> S
                 # Sum S-conflict scores: np.sum(S)  || Sum over users' layer-wise gradient
@@ -116,6 +125,8 @@ class Recon(Server):
             # -> Set of conflict layers L1     (K layers with highest scores)
             # -> Set of non-conflict layers L2 (L-K layers)
             """  """
+            
+            # self.overwrite_grad(g)
             
             self.receive_models()
             if self.dlg_eval and i%self.dlg_gap == 0:

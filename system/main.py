@@ -396,8 +396,11 @@ if __name__ == "__main__":
     parser.add_argument('-cl', "--cluster", type=str, default="kmean",
                         choices=["hdbscan", "kmean", "spectral" ])
     # Recon
-    parser.add_argument('-es', "--s_score", type=float, default=0)
-    
+    parser.add_argument('-sc', "--s_score", type=float, default=0)
+    # parser.add_argument('--sub_method', default='Baseline',
+    #                     choices=['Baseline', 'CAGrad'], type=str,
+    #                     help='The gradient-based methods used in Recon for computing the conflict scores')
+    parser.add_argument('-mr', "--mini_rounds", type=int, default=100)
 
     args = parser.parse_args()
 
