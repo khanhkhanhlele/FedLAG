@@ -400,7 +400,7 @@ if __name__ == "__main__":
     # parser.add_argument('--sub_method', default='Baseline',
     #                     choices=['Baseline', 'CAGrad'], type=str,
     #                     help='The gradient-based methods used in Recon for computing the conflict scores')
-    parser.add_argument('-mr', "--mini_rounds", type=int, default=100)
+    #parser.add_argument('-mr', "--mini_rounds", type=int, default=100)
 
     args = parser.parse_args()
 

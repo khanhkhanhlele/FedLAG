@@ -29,9 +29,13 @@ class Recon(Server):
         
         self.initilize_grads()
         
-        self.s_score = args.s_score
+        self.S_score = OrderedDict()
+        for name in self.layers_name:
+            self.S_score[name] = 0
+        self.s = args.s_score
         #self.sub_method = args.sub_method
-        self.mini_rounds = args.mini_rounds
+        #self.mini_rounds = args.mini_rounds
+        self.mini_rounds = int(self.global_rounds/2)
             
     def initilize_grads(self):
         """
@@ -63,75 +67,69 @@ class Recon(Server):
                     if param.grad is not None:
                         param.grad.zero_()
             
-            # get the update gradient after gradient manipulation
-            # if self.sub_method == 'Baseline':
-            #     g = torch.sum(self.grads, dim=1) / self.num_clients
-            # elif self.sub_method == 'CAGrad':
-            #     g = self.cagrad(self.grads, self.num_clients, rescale=1)
-            # else:
-            #     raise NotImplementedError
-            
-            # The length of the layers
-            length = len(grad_all[0])       # number of layers
+            if(i < self.mini_rounds): 
+                # The length of the layers
+                length = len(grad_all[0])       # number of layers
 
-            """
-            pair_grad = {
-                Layer 1: [
-                    Users 1-2, User 1-3, ... ,User (N-1)-N
-                ],
-                Layer 2: [
-                    Users 1-2, User 1-3, ... ,User (N-1)-N
-                ],
-                ....
-                Layer L: [
-                    Users 1-2, User 1-3, ... ,User (N-1)-N
-                ],
-            }
-            """
-            # get the pair-wise gradients
-            pair_grad = []
-            for i in range(length):
-                temp = []
-                for j in range(self.num_join_clients):
-                    temp.append(grad_all[j][i])
-                temp = torch.stack(temp)
-                pair_grad.append(temp)
+                """
+                pair_grad = {
+                    Layer 1: [
+                        Users 1-2, User 1-3, ... ,User (N-1)-N
+                    ],
+                    Layer 2: [
+                        Users 1-2, User 1-3, ... ,User (N-1)-N
+                    ],
+                    ....
+                    Layer L: [
+                        Users 1-2, User 1-3, ... ,User (N-1)-N
+                    ],
+                }
+                """
+                # get the pair-wise gradients
+                pair_grad = []
+                for i in range(length):
+                    temp = []
+                    for j in range(self.num_join_clients):
+                        temp.append(grad_all[j][i])
+                    temp = torch.stack(temp)
+                    pair_grad.append(temp)
 
-            """
-            layer_wise_cos = {
-                Layer 1: [
-                    Users 1-2, User 1-3, ... ,User (N-1)-N
-                ],
-                Layer 2: [
-                    Users 1-2, User 1-3, ... ,User (N-1)-N
-                ],
-                ....
-                Layer L: [
-                    Users 1-2, User 1-3, ... ,User (N-1)-N
-                ],
-            }
-            """
-            # get all cos<g_i, g_j>
-            for i, pair in enumerate(pair_grad):
-                layer_wise_cos = self.pair_cos(pair).cpu()
-                self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
+                """
+                layer_wise_cos = {
+                    Layer 1: [
+                        Users 1-2, User 1-3, ... ,User (N-1)-N
+                    ],
+                    Layer 2: [
+                        Users 1-2, User 1-3, ... ,User (N-1)-N
+                    ],
+                    ....
+                    Layer L: [
+                        Users 1-2, User 1-3, ... ,User (N-1)-N
+                    ],
+                }
+                """
+                # get all cos<g_i, g_j>
+                for i, pair in enumerate(pair_grad):
+                    layer_wise_cos = self.pair_cos(pair).cpu()
+                    self.layer_wise_angle[self.layers_name[i]].append(layer_wise_cos)
+                    
+                """ Calculate S-conflict scores for all users """
                 
-            """ Calculate S-conflict scores for all users """
-            
-            for value in self.layer_wise_angle.values():
-                print(value)
-                count = np.sum([tensor > self.s_score for tensor in value[0]])
-                print(count)
+                for layer, value in self.layer_wise_angle.values():
+                    count = np.sum([tensor < self.s for tensor in value[0]])
+                    self.S_score[layer] += count
                 
-            # Loops over all layers
-                # Compute number of cos < 0 -> S
-                # Sum S-conflict scores: np.sum(S)  || Sum over users' layer-wise gradient
+                print(self.S_score)
+                    
+                # Loops over all layers
+                    # Compute number of cos < 0 -> S
+                    # Sum S-conflict scores: np.sum(S)  || Sum over users' layer-wise gradient
 
-            # Top K layers with highest score -> Get index of layers
+                # Top K layers with highest score -> Get index of layers
 
-            # -> Set of conflict layers L1     (K layers with highest scores)
-            # -> Set of non-conflict layers L2 (L-K layers)
-            """  """
+                # -> Set of conflict layers L1     (K layers with highest scores)
+                # -> Set of non-conflict layers L2 (L-K layers)
+                """  """
             
             # self.overwrite_grad(g)
             
