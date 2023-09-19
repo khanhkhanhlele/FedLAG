@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 from collections import OrderedDict
 import copy
+import numpy as np
 
 class Recon(Server):
     def __init__(self, args, times):
@@ -116,7 +117,8 @@ class Recon(Server):
             """ Calculate S-conflict scores for all users """
             
             for value in self.layer_wise_angle.values():
-                print(value.type())
+                num  = np.count_nonzero(value < self.s_score)
+                print(num)
             # Loops over all layers
                 # Compute number of cos < 0 -> S
                 # Sum S-conflict scores: np.sum(S)  || Sum over users' layer-wise gradient
