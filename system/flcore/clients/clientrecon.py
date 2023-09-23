@@ -118,8 +118,9 @@ class clientRecon(Client):
         for model_idx, (params_model1, params_model2) in enumerate(zip(model.named_parameters(), self.model.named_parameters())):
             name_model1, param_model1 = params_model1
             name_model2, param_model2 = params_model2
-            if(name_model1 not in layer):
-                print(name_model1)
+            print(name_model1, name_model2)
+            print(param_model1, param_model2)
+            break
                 
 
         
