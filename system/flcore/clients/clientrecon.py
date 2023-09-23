@@ -115,8 +115,10 @@ class clientRecon(Client):
         """ 
         clone parameter from layer in list layer
         """
-        for name, _layer in model.named_modules():
-            print(name)
+        for name, param in model.named_parameters():
+            if param.requires_grad:
+                print(f"Layer: {name} | Parameters: {param.numel()}")
+
         
         for new_param, old_param in zip(model.parameters(), self.model.parameters()):
             old_param.data = new_param.data.clone()
