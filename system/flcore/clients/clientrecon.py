@@ -115,9 +115,10 @@ class clientRecon(Client):
         """ 
         clone parameter from layer in list layer
         """
-        for new_name, new_param, old_name, old_param  in zip(model.named_parameters(), self.model.parameters()):
-            print(new_name, new_param, old_name, old_param)
-            print('-'*30)
+        for model_idx, (params_model1, params_model2) in enumerate(zip(model.named_parameters(), self.model.named_parameters())):
+            name_model1, param_model1 = params_model1
+            name_model2, param_model2 = params_model2
+            print(name_model1, param_model1, name_model2, param_model2)
 
         
         for new_param, old_param in zip(model.parameters(), self.model.parameters()):
