@@ -299,7 +299,7 @@ class FedAvgCNN20(nn.Module):
         self.relu10 = nn.ReLU()
         
         # Output Layer (Fully Connected)
-        self.fc3 = nn.Linear(512, num_classes)
+        self.fc = nn.Linear(512, num_classes)
         
     def forward(self, x):
         out = self.conv1(x)
