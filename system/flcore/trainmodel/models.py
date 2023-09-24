@@ -249,9 +249,9 @@ class FedAvgCNN(nn.Module):
 #20 layers
 
 
-class CustomCNN(nn.Module):
-    def __init__(self, in_channels=1, num_classes=10):
-        super(CustomCNN, self).__init__()
+class FedAvgCNN20(nn.Module):
+    def __init__(self, in_channels=1, num_classes=10, dim=1024):
+        super().__init__()
         
         # Layer 1
         self.conv1 = nn.Conv2d(in_channels, 32, kernel_size=3, padding=1)
