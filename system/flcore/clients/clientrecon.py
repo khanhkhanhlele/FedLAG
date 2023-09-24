@@ -54,7 +54,7 @@ class clientRecon(Client):
             eps, DELTA = get_dp_params(privacy_engine)
             print(f"Client {self.id}", f"epsilon = {eps:.2f}, sigma = {DELTA}")
 
-    def get_layer(self):
+    def get_layers(self):
         return self.model.state_dict().keys()
     
     def _get_layers(self):
