@@ -130,7 +130,7 @@ class clientRecon(Client):
             name_model1, param_model1 = params_model1
             name_model2, param_model2 = params_model2
             
-            param_model2 = params_model1.clone()
+            param_model2 = params_model1
                 
 
         
