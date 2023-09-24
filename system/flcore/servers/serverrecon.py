@@ -22,7 +22,7 @@ class Recon(Server):
         # self.load_model()
         self.Budget = []
         self.network = self.clients[0].model.cuda()
-        self.layers_dict = self.clients[0]._get_layers()
+        self.layers_dict = self.clients[0].get_layers() #_get_layers
         self.layers_name = list(self.layers_dict.keys())
         self.grad_dims = self.clients[0].get_grad_dims()
         self.layer_wise_angle = OrderedDict()
@@ -34,7 +34,8 @@ class Recon(Server):
         self.s = args.s_score
         #self.sub_method = args.sub_method
         #self.mini_rounds = args.mini_rounds
-        self.mini_rounds = int(self.global_rounds/2)
+        #self.mini_rounds = int(self.global_rounds/2)
+        self.mini_rounds = 1
         self.top_k = args.top_k
             
     def initilize_grads(self):
