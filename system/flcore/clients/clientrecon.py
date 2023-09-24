@@ -55,7 +55,15 @@ class clientRecon(Client):
             print(f"Client {self.id}", f"epsilon = {eps:.2f}, sigma = {DELTA}")
 
     def get_layers(self):
-        return self.model.state_dict().keys()
+        name_list = self.model.state_dict().keys()
+        layers_dict = {}
+        for i, name in enumerate(name_list):
+            if name not in layers_dict:
+                layers_dict[name] = [i]
+            else:
+                layers_dict[name].append(i)
+
+        return layers_dict
     
     def _get_layers(self):
         """
