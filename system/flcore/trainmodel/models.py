@@ -339,7 +339,7 @@ class FedAvgCNN20(nn.Module):
         out = self.fc2(out)
         out = self.relu10(out)
         
-        out = self.fc3(out)
+        out = self.fc(out)
         
         return out
 
