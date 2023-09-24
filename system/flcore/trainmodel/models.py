@@ -331,7 +331,8 @@ class FedAvgCNN20(nn.Module):
         out = self.relu8(out)
         out = self.maxpool5(out)
         
-        out = out.view(out.size(0), -1)
+        #out = out.view(out.size(0), -1)
+        out = torch.flatten(out, 1)
         
         out = self.fc1(out)
         out = self.relu9(out)
