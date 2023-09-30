@@ -35,6 +35,7 @@ class FedAvg(Server):
 
             # threads = [Thread(target=client.train)
             #            for client in self.selected_clients]
+            
             # [t.start() for t in threads]
             # [t.join() for t in threads]
 
