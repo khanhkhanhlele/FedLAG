@@ -277,7 +277,7 @@ class FedAvgCNN20(nn.Module):
             nn.Linear(128 * 4 * 4, 512),
             nn.ReLU(inplace=True)
         )
-        self.fc2 = nn.Linear(512, num_classes)
+        self.fc = nn.Linear(512, num_classes)
 
     def forward(self, x):
         out = self.conv1(x)
@@ -285,7 +285,7 @@ class FedAvgCNN20(nn.Module):
         out = self.conv3(out)
         out = out.view(out.size(0), -1)
         out = self.fc1(out)
-        out = self.fc2(out)
+        out = self.fc(out)
         return out
 
 
