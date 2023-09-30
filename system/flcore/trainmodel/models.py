@@ -329,7 +329,7 @@ class FedAvgCNN20(nn.Module):
         
         out = self.conv8(out)
         out = self.relu8(out)
-        out = self.maxpool5(out)
+        #out = self.maxpool5(out)
         
         #out = out.view(out.size(0), -1)
         #out = torch.flatten(out, 1)
@@ -344,6 +344,9 @@ class FedAvgCNN20(nn.Module):
         out = self.fc(out)
         
         return out
+    
+
+
 
 # ====================================================================================================================
 
