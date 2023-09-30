@@ -250,10 +250,10 @@ class FedAvgCNN(nn.Module):
 
 
 class FedAvgCNN20(nn.Module):
-    def __init__(self, in_channels, num_classes,dim=0):
+    def __init__(self, in_features, num_classes,dim=0):
         super().__init__()
         self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels, 32, kernel_size=3, padding=1),
+            nn.Conv2d(in_features, 32, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(32, 32, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
