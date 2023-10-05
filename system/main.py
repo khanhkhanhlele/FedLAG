@@ -35,6 +35,13 @@ from flcore.servers.servergen import FedGen
 from flcore.servers.serverscaffold import SCAFFOLD
 from flcore.servers.serverdistill import FedDistill
 from flcore.servers.serverala import FedALA
+from flcore.servers.serverpac import FedPAC
+from flcore.servers.serverlg import LG_FedAvg
+from flcore.servers.servergc import FedGC
+from flcore.servers.serverfml import FML
+from flcore.servers.serverkd import FedKD
+from flcore.servers.serverpcl import FedPCL
+from flcore.servers.servercp import FedCP
 
 from flcore.trainmodel.models import *
 
@@ -42,6 +49,7 @@ from flcore.trainmodel.bilstm import *
 from flcore.trainmodel.resnet import *
 from flcore.trainmodel.alexnet import *
 from flcore.trainmodel.mobilenet_v2 import *
+from flcore.trainmodel.transformer import *
 
 from utils.result_utils import average_data
 from utils.mem_utils import MemReporter
@@ -287,6 +295,43 @@ def run(args):
 
         elif args.algorithm == "FedALA":
             server = FedALA(args, i)
+
+        elif args.algorithm == "FedPAC":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = FedPAC(args, i)
+
+        elif args.algorithm == "LG-FedAvg":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = LG_FedAvg(args, i)
+
+        elif args.algorithm == "FedGC":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = FedGC(args, i)
+
+        elif args.algorithm == "FML":
+            server = FML(args, i)
+
+        elif args.algorithm == "FedKD":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = FedKD(args, i)
+
+        elif args.algorithm == "FedPCL":
+            args.model.fc = nn.Identity()
+            server = FedPCL(args, i)
+
+        elif args.algorithm == "FedCP":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = FedCP(args, i)
             
         else:
             raise NotImplementedError
@@ -388,7 +433,7 @@ if __name__ == "__main__":
     # Ditto / FedRep
     parser.add_argument('-pls', "--plocal_steps", type=int, default=1)
     # MOON
-    parser.add_argument('-ta', "--tau", type=float, default=1.0)
+    parser.add_argument('-tau', "--tau", type=float, default=1.0)
     # FedBABU
     parser.add_argument('-fts', "--fine_tuning_steps", type=int, default=10)
     # APPLE
@@ -415,6 +460,11 @@ if __name__ == "__main__":
     parser.add_argument( "--top_k", type=int, default=2)
     
     #parser.add_argument('-mr', "--mini_rounds", type=int, default=100)
+
+    # FedKD
+    parser.add_argument('-mlr', "--mentee_learning_rate", type=float, default=0.005)
+    parser.add_argument('-Ts', "--T_start", type=float, default=0.95)
+    parser.add_argument('-Te', "--T_end", type=float, default=0.98)
 
     args = parser.parse_args()
 
