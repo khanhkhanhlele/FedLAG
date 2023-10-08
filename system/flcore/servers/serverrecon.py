@@ -34,8 +34,8 @@ class Recon(Server):
         self.s = args.s_score
         #self.sub_method = args.sub_method
         #self.mini_rounds = args.mini_rounds
-        #self.mini_rounds = int(self.global_rounds/2)
-        self.mini_rounds = 30
+        self.mini_rounds = int(self.global_rounds/2)
+        #self.mini_rounds = 30
         self.top_k = args.top_k
             
     def initilize_grads(self):
