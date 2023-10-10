@@ -154,8 +154,8 @@ class Recon(Server):
         for i in range(self.mini_rounds+1, self.global_rounds+1):
             s_t = time.time()
             self.selected_clients = self.select_clients()
-            #self.send_model_recon(top_k_layer)
-            self.send_models()
+            self.send_model_recon(top_k_layer)
+            #self.send_models()
 
             if i%self.eval_gap == 0:
                 print(f"\n-------------Round number: {i}-------------")
