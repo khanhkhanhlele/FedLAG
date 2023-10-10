@@ -256,10 +256,10 @@ class Client(object):
         for model_idx, (params_model1, params_model2) in enumerate(zip(model.named_parameters(), self.model.named_parameters())):
             name_model1, param_model1 = params_model1
             name_model2, param_model2 = params_model2
-            print(name_model1+"----"+name_model2)
-            print("_____________________")
+            # print(name_model1+"----"+name_model2)
+            # print("_____________________")
             if name_model1 in layer:
-                none
+                None
                 #break
             param_model2 = params_model1
                 
