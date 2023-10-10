@@ -1,18 +1,21 @@
+import random
 import time
-from flcore.clients.clientrecon import clientRecon
+from flcore.clients.clientbabu_rec import clientBABU_REC
 from flcore.servers.serverbase import Server
 from threading import Thread
-from collections import OrderedDict
-import numpy as np
 import torch
+import torch.nn.functional as F
+from collections import OrderedDict
+import copy
+import numpy as np
 
-class Recon(Server):
+class BABU_REC(Server):
     def __init__(self, args, times):
         super().__init__(args, times)
 
         # select slow clients
         self.set_slow_clients()
-        self.set_clients(clientRecon)
+        self.set_clients(clientBABU_REC)
 
         print(f"\nJoin ratio / total clients: {self.join_ratio} / {self.num_clients}")
         print("Finished creating server and clients.")
@@ -35,13 +38,13 @@ class Recon(Server):
         self.mini_rounds = int(self.global_rounds/2)
         #self.mini_rounds = 30
         self.top_k = args.top_k
-            
+
     def initilize_grads(self):
         """
         Initialize the gradients. Need to be called before every training iteration.
         """
         self.grads = torch.zeros(sum(self.grad_dims), self.num_join_clients).cuda()
-
+        
     def train(self):
         for i in range(self.mini_rounds+1):
             grad_all = []
@@ -65,7 +68,7 @@ class Recon(Server):
                 for param in client.model.parameters():
                     if param.grad is not None:
                         param.grad.zero_()
-            
+
             # The length of the layers
             length = len(grad_all[0])       # number of layers
 
@@ -129,21 +132,19 @@ class Recon(Server):
             """  """
             
             # self.overwrite_grad(g)
-            
+            # threads = [Thread(target=client.train)
+            #            for client in self.selected_clients]
+            # [t.start() for t in threads]
+            # [t.join() for t in threads]
+
             self.receive_models()
             if self.dlg_eval and i%self.dlg_gap == 0:
                 self.call_dlg(i)
-
-            # Global Aggregation of round N only non-conflict layers L1
-            # self.aggregate_parameters_recon(L2)
             self.aggregate_parameters()
-
-            self.Budget.append(time.time() - s_t)
-            print('-'*25, 'time cost', '-'*25, self.Budget[-1])
 
             if self.auto_break and self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt):
                 break
-        
+            
         print('-'*30)
         print(self.S_score)
         top_k_items = sorted(self.S_score.items(), key=lambda x: x[1], reverse=True)[:self.top_k]
@@ -179,21 +180,100 @@ class Recon(Server):
 
             if self.auto_break and self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt):
                 break
-        
+
         print("\nBest accuracy.")
         # self.print_(max(self.rs_test_acc), max(
         #     self.rs_train_acc), min(self.rs_train_loss))
         print(max(self.rs_test_acc))
-        print("\nAverage time cost per round.")
-        print(sum(self.Budget[1:])/len(self.Budget[1:]))
+
+        for client in self.clients:
+            client.fine_tune()
+        print("\n-------------Evaluate fine-tuned personalized models-------------")
+        self.evaluate()
 
         self.save_results()
         self.save_global_model()
 
         if self.num_new_clients > 0:
             self.eval_new_clients = True
-            self.set_new_clients(clientRecon)
+            self.set_new_clients(clientBABU_REC)
             print(f"\n-------------Fine tuning round-------------")
             print("\nEvaluate new clients")
             self.evaluate()
+
+    def receive_models(self):
+        assert (len(self.selected_clients) > 0)
+
+        active_clients = random.sample(
+            self.selected_clients, int((1-self.client_drop_rate) * self.current_num_join_clients))
+
+        self.uploaded_ids = []
+        self.uploaded_weights = []
+        self.uploaded_models = []
+        tot_samples = 0
+        for client in active_clients:
+            try:
+                client_time_cost = client.train_time_cost['total_cost'] / client.train_time_cost['num_rounds'] + \
+                        client.send_time_cost['total_cost'] / client.send_time_cost['num_rounds']
+            except ZeroDivisionError:
+                client_time_cost = 0
+            if client_time_cost <= self.time_threthold:
+                tot_samples += client.train_samples
+                self.uploaded_ids.append(client.id)
+                self.uploaded_weights.append(client.train_samples)
+                self.uploaded_models.append(client.model.base)
+        for i, w in enumerate(self.uploaded_weights):
+            self.uploaded_weights[i] = w / tot_samples
+    
+    def pair_cos(self, pair):
+        length = pair.size(0)
+
+        dot_value = []
+        for i in range(length - 1):
+            for j in range(i + 1, length):
+                dot_value.append(self.cos(pair[i], pair[j]))
+
+        dot_value = torch.stack(dot_value).view(-1)
+        return dot_value
+    def cos(self, t1, t2):
+        t1 = F.normalize(t1, dim=0)
+        t2 = F.normalize(t2, dim=0)
+
+        dot = (t1 * t2).sum(dim=0)
+
+        return dot
+    
+    def overwrite_grad(self, newgrad):
+        newgrad = newgrad * self.num_join_clients  # to match the sum loss
+        cnt = 0
+        for name, param in self.network.named_parameters():
+            beg = 0 if cnt == 0 else sum(self.grad_dims[:cnt])
+            en = sum(self.grad_dims[:cnt + 1])
+            this_grad = newgrad[beg: en].contiguous().view(param.data.size())
+            param.grad = this_grad.data.clone()
+            cnt += 1
+
+    def aggregate_parameters_recon(self, L2):
+        # L2: 1 list of layer index
+        assert (len(self.uploaded_models) > 0)
+
+        self.global_model = copy.deepcopy(self.uploaded_models[0])
+        for param in self.global_model.parameters():
+            param.data.zero_()
+
+        # for w, client_model in zip(self.uploaded_weights, self.uploaded_models):
+            # for layer in client_model parameters:
+                # if layer is existed in L2:
+                    # self.add_parameters(w, client_model)
+                # else:
+                    # pass
+    def send_model_recon(self, layer):
+        assert (len(self.clients) > 0)
+
+        for client in self.clients:
+            start_time = time.time()
             
+            client.set_parameters_recon(self.global_model, layer)
+
+            client.send_time_cost['num_rounds'] += 1
+            client.send_time_cost['total_cost'] += 2 * (time.time() - start_time)

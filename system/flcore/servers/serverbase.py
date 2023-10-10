@@ -9,6 +9,10 @@ import random
 from utils.data_utils import read_client_data
 from utils.dlg import DLG
 
+import torch.nn.functional as F
+
+import copy
+import numpy as np
 
 class Server(object):
     def __init__(self, args, times):
@@ -368,3 +372,58 @@ class Server(object):
         ids = [c.id for c in self.new_clients]
 
         return ids, num_samples, tot_correct, tot_auc
+    
+    ##########################################################################
+    #RECON BASE#
+    def pair_cos(self, pair):
+        length = pair.size(0)
+
+        dot_value = []
+        for i in range(length - 1):
+            for j in range(i + 1, length):
+                dot_value.append(self.cos(pair[i], pair[j]))
+
+        dot_value = torch.stack(dot_value).view(-1)
+        return dot_value
+    def cos(self, t1, t2):
+        t1 = F.normalize(t1, dim=0)
+        t2 = F.normalize(t2, dim=0)
+
+        dot = (t1 * t2).sum(dim=0)
+
+        return dot
+    
+    def aggregate_parameters_recon(self, L2):
+        # L2: 1 list of layer index
+        assert (len(self.uploaded_models) > 0)
+
+        self.global_model = copy.deepcopy(self.uploaded_models[0])
+        for param in self.global_model.parameters():
+            param.data.zero_()
+
+        # for w, client_model in zip(self.uploaded_weights, self.uploaded_models):
+            # for layer in client_model parameters:
+                # if layer is existed in L2:
+                    # self.add_parameters(w, client_model)
+                # else:
+                    # pass
+    def send_model_recon(self, layer):
+        assert (len(self.clients) > 0)
+
+        for client in self.clients:
+            start_time = time.time()
+            
+            client.set_parameters_recon(self.global_model, layer)
+
+            client.send_time_cost['num_rounds'] += 1
+            client.send_time_cost['total_cost'] += 2 * (time.time() - start_time)
+
+    def overwrite_grad(self, newgrad):
+        newgrad = newgrad * self.num_join_clients  # to match the sum loss
+        cnt = 0
+        for name, param in self.network.named_parameters():
+            beg = 0 if cnt == 0 else sum(self.grad_dims[:cnt])
+            en = sum(self.grad_dims[:cnt + 1])
+            this_grad = newgrad[beg: en].contiguous().view(param.data.size())
+            param.grad = this_grad.data.clone()
+            cnt += 1
