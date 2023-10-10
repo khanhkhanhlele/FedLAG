@@ -261,3 +261,6 @@ class Client(object):
                 break
             param_model2 = params_model1
                 
+        # for new_param, old_param in zip(model.parameters(), self.model.parameters()):
+        #     old_param.data = new_param.data.clone()
+
