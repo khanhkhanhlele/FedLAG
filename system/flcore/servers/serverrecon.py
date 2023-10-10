@@ -151,36 +151,36 @@ class Recon(Server):
         print( top_k_layer)
         print('-'*30)
         
-        # for i in range(self.mini_rounds+1, self.global_rounds+1):
-        #     s_t = time.time()
-        #     self.selected_clients = self.select_clients()
-        #     self.send_model_recon(top_k_layer)
-
-        #     if i%self.eval_gap == 0:
-        #         print(f"\n-------------Round number: {i}-------------")
-        #         print("\nEvaluate global model")
-        #         self.evaluate()
-
-        #     for client in self.selected_clients:
-        #         client.train()
-
-        #     # threads = [Thread(target=client.train)
-        #     #            for client in self.selected_clients]
-        #     # [t.start() for t in threads]
-        #     # [t.join() for t in threads]
-
-        #     self.receive_models()
-        #     if self.dlg_eval and i%self.dlg_gap == 0:
-        #         self.call_dlg(i)
-        #     self.aggregate_parameters()
-
-        #     self.Budget.append(time.time() - s_t)
-        #     print('-'*25, 'time cost', '-'*25, self.Budget[-1])
-
-        #     if self.auto_break and self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt):
-        #         break
-            
         for i in range(self.mini_rounds+1, self.global_rounds+1):
+            s_t = time.time()
+            self.selected_clients = self.select_clients()
+            self.send_model_recon(top_k_layer)
+
+            if i%self.eval_gap == 0:
+                print(f"\n-------------Round number: {i}-------------")
+                print("\nEvaluate global model")
+                self.evaluate()
+
+            for client in self.selected_clients:
+                client.train()
+
+            # threads = [Thread(target=client.train)
+            #            for client in self.selected_clients]
+            # [t.start() for t in threads]
+            # [t.join() for t in threads]
+
+            self.receive_models()
+            if self.dlg_eval and i%self.dlg_gap == 0:
+                self.call_dlg(i)
+            self.aggregate_parameters()
+
+            self.Budget.append(time.time() - s_t)
+            print('-'*25, 'time cost', '-'*25, self.Budget[-1])
+
+            if self.auto_break and self.check_done(acc_lss=[self.rs_test_acc], top_cnt=self.top_cnt):
+                break
+            
+        for i in range(self.global_rounds+1, self.global_rounds+5):
             s_t = time.time()
             self.selected_clients = self.select_clients()
             self.send_models()
