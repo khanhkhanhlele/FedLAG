@@ -178,3 +178,85 @@ class Client(object):
     # @staticmethod
     # def model_exists():
     #     return os.path.exists(os.path.join("models", "server" + ".pt"))
+
+    ##############################################################################
+    #RECON
+    def get_layers(self):
+        name_list = self.model.state_dict().keys()
+        layers_dict = {}
+        for i, name in enumerate(name_list):
+            if name not in layers_dict:
+                layers_dict[name] = [i]
+            else:
+                layers_dict[name].append(i)
+
+        return layers_dict
+    
+    def _get_layers(self):
+        """
+        Remove the suffix of the name of the shared layer.
+        Return:
+            The dictionary of shared layers: layer_dict[name]=The list of positions in the shared layers.
+        """
+
+        # parameters = self.model.parameters()
+        # name_list = list(parameters.keys())
+        name_list = self.model.state_dict().keys()
+        layers_dict = {}
+        for i, name in enumerate(name_list):
+            if '.weight' in name:
+                name = name.replace('.weight', '')
+            elif '.bias' in name:
+                name = name.replace('.bias', '')
+
+            if name not in layers_dict:
+                layers_dict[name] = [i]
+            else:
+                layers_dict[name].append(i)
+
+        return layers_dict
+
+    def grad2vec_list(self):
+        """
+        Get parameter-wise gradients. (weight and bias are not concatenated.)
+        """
+        grad_list = []
+        for name, param in self.model.named_parameters():
+            grad = param.grad
+            if grad is not None:
+                grad_cur = grad.data.detach().clone().view(-1)
+                grad_list.append(grad_cur)
+        return grad_list
+
+    def split_layer(self, grad_list, name_dict):
+        """
+        Get the layer-wise gradients. (weight and bias are concatenated.)
+        """
+        grad_new = []
+        for key, value in name_dict.items():
+            grad = [grad_list[i] for i in value]
+            grad = torch.cat(grad)
+            grad_new.append(grad)
+
+        return grad_new
+    
+    def get_grad_dims(self):
+        """
+        Get the number of parameters in shared layers.
+        """
+        grad_dims = []
+        for key, param in self.model.named_parameters():
+            grad_dims.append(param.data.numel())
+        return grad_dims
+    
+    def set_parameters_recon(self, model, layer):
+        """ 
+        clone parameter from layer in list layer
+        """
+        for model_idx, (params_model1, params_model2) in enumerate(zip(model.named_parameters(), self.model.named_parameters())):
+            name_model1, param_model1 = params_model1
+            name_model2, param_model2 = params_model2
+            if name_model1 in layer:
+                break
+            param_model2 = params_model1
+                
