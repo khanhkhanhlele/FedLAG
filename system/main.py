@@ -30,6 +30,7 @@ from flcore.servers.serverproto import FedProto
 from flcore.servers.serverdyn import FedDyn
 from flcore.servers.servermoon import MOON
 from flcore.servers.serverbabu import FedBABU
+from flcore.servers.serverbabu_rec import BABU_REC
 from flcore.servers.serverapple import APPLE
 from flcore.servers.servergen import FedGen
 from flcore.servers.serverscaffold import SCAFFOLD
@@ -269,6 +270,12 @@ def run(args):
             args.model.fc = nn.Identity()
             args.model = BaseHeadSplit(args.model, args.head)
             server = FedBABU(args, i)
+            
+        elif args.algorithm == "Babu_Rec":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = BABU_REC(args, i)
 
         elif args.algorithm == "APPLE":
             server = APPLE(args, i)
