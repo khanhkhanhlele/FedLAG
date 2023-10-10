@@ -257,9 +257,9 @@ class Client(object):
             name_model1, param_model1 = params_model1
             name_model2, param_model2 = params_model2
             if name_model1 in layer:
+                print(name_model1)
                 None
                 continue
-            print("name_model1")
             param_model2 = params_model1
             params_model2 = params_model1
         # for new_param, old_param in zip(model.parameters(), self.model.parameters()):
