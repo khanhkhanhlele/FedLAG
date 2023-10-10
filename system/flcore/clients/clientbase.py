@@ -257,8 +257,9 @@ class Client(object):
             name_model1, param_model1 = params_model1
             name_model2, param_model2 = params_model2
             print(name_model1+"----"+name_model2)
+            print("_____________________")
             if name_model1 in layer:
-                print(name_model1)
+                
                 break
             param_model2 = params_model1
                 
