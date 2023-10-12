@@ -7,7 +7,7 @@ from collections import OrderedDict
 import torch
 
 
-class FedROD(Server):
+class ROD_REC(Server):
     def __init__(self, args, times):
         super().__init__(args, times)
 
