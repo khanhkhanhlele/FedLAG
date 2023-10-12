@@ -14,6 +14,7 @@ class clientBABU_REC(Client):
 
         # for param in self.model.head.parameters():
         #     param.requires_grad = False
+        # cần xử lý khúc này
 
 
     def train(self):
