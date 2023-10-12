@@ -12,8 +12,8 @@ class clientBABU_REC(Client):
 
         self.fine_tuning_steps = args.fine_tuning_steps
 
-        for param in self.model.head.parameters():
-            param.requires_grad = False
+        # for param in self.model.head.parameters():
+        #     param.requires_grad = False
 
 
     def train(self):
