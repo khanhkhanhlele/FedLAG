@@ -80,13 +80,13 @@ class Server(object):
             "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),
         )
         
-        wandb.init(
-            project="PFLA",
-            entity="scalemind",
-            config=args,
-            name=args.run_name,
-            force=True
-        )
+        # wandb.init(
+        #     project="PFLA",
+        #     entity="scalemind",
+        #     config=args,
+        #     name=args.run_name,
+        #     force=True
+        # )
 
     def set_clients(self, clientObj):
         for i, train_slow, send_slow in zip(range(self.num_clients), self.train_slow_clients, self.send_slow_clients):
@@ -279,20 +279,20 @@ class Server(object):
         print("Std Test Accurancy: {:.4f}".format(test_acc_std))
         print("Std Test AUC: {:.4f}".format(test_auc_std))
         
-        self.writer.add_scalar("charts/train_loss", train_loss, self.current_round)
-        wandb.log({"charts/train_loss": train_loss}, step=self.current_round)
+        # self.writer.add_scalar("charts/train_loss", train_loss, self.current_round)
+        # wandb.log({"charts/train_loss": train_loss}, step=self.current_round)
         
-        self.writer.add_scalar("charts/test_acc", test_acc, self.current_round)
-        wandb.log({"charts/test_acc": test_acc}, step=self.current_round)
+        # self.writer.add_scalar("charts/test_acc", test_acc, self.current_round)
+        # wandb.log({"charts/test_acc": test_acc}, step=self.current_round)
         
-        self.writer.add_scalar("charts/test_auc", test_auc, self.current_round)
-        wandb.log({"charts/test_auc": test_auc}, step=self.current_round)
+        # self.writer.add_scalar("charts/test_auc", test_auc, self.current_round)
+        # wandb.log({"charts/test_auc": test_auc}, step=self.current_round)
         
-        self.writer.add_scalar("charts/test_acc_std", test_acc_std, self.current_round)
-        wandb.log({"charts/test_acc_std": test_acc_std}, step=self.current_round)
+        # self.writer.add_scalar("charts/test_acc_std", test_acc_std, self.current_round)
+        # wandb.log({"charts/test_acc_std": test_acc_std}, step=self.current_round)
         
-        self.writer.add_scalar("charts/test_auc_std", test_auc_std, self.current_round)
-        wandb.log({"charts/test_auc_std": test_auc_std}, step=self.current_round)
+        # self.writer.add_scalar("charts/test_auc_std", test_auc_std, self.current_round)
+        # wandb.log({"charts/test_auc_std": test_auc_std}, step=self.current_round)
         
         self.current_round += 1
 
