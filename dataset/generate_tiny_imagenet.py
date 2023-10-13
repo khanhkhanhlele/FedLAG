@@ -2,6 +2,7 @@ import numpy as np
 import os
 import sys
 import random
+from glob import glob
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -10,9 +11,9 @@ from torchvision.datasets import ImageFolder, DatasetFolder
 
 random.seed(1)
 np.random.seed(1)
-num_clients = 20
+# num_clients = 20
 num_classes = 200
-dir_path = "Tiny-imagenet/"
+dir_path = "Tiny-imagenet"
 
 # http://cs231n.stanford.edu/tiny-imagenet-200.zip
 # https://github.com/QinbinLi/MOON/blob/6c7a4ed1b1a8c0724fa2976292a667a828e3ff5d/datasets.py#L148
@@ -56,9 +57,9 @@ def generate_dataset(dir_path, num_clients, num_classes, niid, balance, partitio
         os.makedirs(dir_path)
         
     # Setup directory for train/test data
-    config_path = dir_path + "config.json"
-    train_path = dir_path + "train/"
-    test_path = dir_path + "test/"
+    config_path = dir_path + "/config.json"
+    train_path = dir_path + "/train/"
+    test_path = dir_path + "/test/"
 
     if check(config_path, train_path, test_path, num_clients, num_classes, niid, balance, partition):
         return
@@ -67,8 +68,8 @@ def generate_dataset(dir_path, num_clients, num_classes, niid, balance, partitio
     transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    trainset = ImageFolder_custom(root=dir_path+'rawdata/tiny-imagenet-200/train/', transform=transform)
-    testset = ImageFolder_custom(root=dir_path+'rawdata/tiny-imagenet-200/val/', transform=transform)
+    trainset = ImageFolder_custom(root=dir_path+'/rawdata/tinyimagenet/src/train/', transform=transform)
+    testset = ImageFolder_custom(root=dir_path+'/rawdata/tinyimagenet/src/test/', transform=transform)
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=len(trainset), shuffle=False)
     testloader = torch.utils.data.DataLoader(
@@ -105,5 +106,30 @@ if __name__ == "__main__":
     niid = True if sys.argv[1] == "noniid" else False
     balance = True if sys.argv[2] == "balance" else False
     partition = sys.argv[3] if sys.argv[3] != "-" else None
+    num_clients = int(sys.argv[4]) if sys.argv[4] else 20
+    
+    rawdata_path = os.getcwd() + f"/{dir_path}/rawdata"
+    if not os.path.exists(rawdata_path):
+        os.makedirs(rawdata_path)
+        
+    if not os.path.exists(rawdata_path + "/tinyimagenet/src"):    
+        
+        download_link = "http://100.125.42.33/tinyimagenet.zip"
+        
+        os.chdir(rawdata_path)
+        
+        if not os.path.exists(os.getcwd() + "/tinyimagenet.zip") and len(glob(os.getcwd() + "/tinyimagenet/*.parquet")) != 2:
+            try:
+                os.system(f"curl {download_link} -O")
+            except:
+                print(f"Cannot Download Tiny Image Net from link: {download_link}")
+                exit(0)
+        
+        os.system("unzip tinyimagenet.zip")
+        os.chdir(rawdata_path + "/tinyimagenet")
+        os.system("python extract.py")
+        for _ in range(3):
+            os.chdir("..")
+        print(f"Back to : {os.getcwd()}")
 
     generate_dataset(dir_path, num_clients, num_classes, niid, balance, partition)
