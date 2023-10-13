@@ -14,6 +14,9 @@ import torch.nn.functional as F
 import copy
 import numpy as np
 
+from torch.utils.tensorboard import SummaryWriter
+import wandb
+
 class Server(object):
     def __init__(self, args, times):
         # Set up the main attributes
@@ -66,6 +69,24 @@ class Server(object):
         self.new_clients = []
         self.eval_new_clients = False
         self.fine_tuning_epoch = args.fine_tuning_epoch
+        
+        args.run_name = f"{args.algorithm}__{args.dataset}__{args.num_clients}__{int(time.time())}"
+        
+        self.current_round = 0
+        self.save_dir = f"runs/{args.run_name}"
+        self.writer = SummaryWriter(self.save_dir)
+        self.writer.add_text(
+            "hyperparameters",
+            "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),
+        )
+        
+        wandb.init(
+            project="PFLA",
+            entity="scalemind",
+            config=args,
+            name=args.run_name,
+            force=True
+        )
 
     def set_clients(self, clientObj):
         for i, train_slow, send_slow in zip(range(self.num_clients), self.train_slow_clients, self.send_slow_clients):
@@ -252,9 +273,28 @@ class Server(object):
         print("Averaged Train Loss: {:.4f}".format(train_loss))
         print("Averaged Test Accurancy: {:.4f}".format(test_acc))
         print("Averaged Test AUC: {:.4f}".format(test_auc))
-        # self.print_(test_acc, train_acc, train_loss)
-        print("Std Test Accurancy: {:.4f}".format(np.std(accs)))
-        print("Std Test AUC: {:.4f}".format(np.std(aucs)))
+        
+        test_acc_std = np.std(accs).item()
+        test_auc_std = np.std(aucs).item()
+        print("Std Test Accurancy: {:.4f}".format(test_acc_std))
+        print("Std Test AUC: {:.4f}".format(test_auc_std))
+        
+        self.writer.add_scalar("charts/train_loss", train_loss, self.current_round)
+        wandb.log({"charts/train_loss": train_loss}, step=self.current_round)
+        
+        self.writer.add_scalar("charts/test_acc", test_acc, self.current_round)
+        wandb.log({"charts/test_acc": test_acc}, step=self.current_round)
+        
+        self.writer.add_scalar("charts/test_auc", test_auc, self.current_round)
+        wandb.log({"charts/test_auc": test_auc}, step=self.current_round)
+        
+        self.writer.add_scalar("charts/test_acc_std", test_acc_std, self.current_round)
+        wandb.log({"charts/test_acc_std": test_acc_std}, step=self.current_round)
+        
+        self.writer.add_scalar("charts/test_auc_std", test_auc_std, self.current_round)
+        wandb.log({"charts/test_auc_std": test_auc_std}, step=self.current_round)
+        
+        self.current_round += 1
 
     def print_(self, test_acc, test_auc, train_loss):
         print("Average Test Accurancy: {:.4f}".format(test_acc))
