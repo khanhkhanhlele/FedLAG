@@ -37,6 +37,7 @@ from flcore.servers.servergen import FedGen
 from flcore.servers.serverscaffold import SCAFFOLD
 from flcore.servers.serverdistill import FedDistill
 from flcore.servers.serverala import FedALA
+from flcore.servers.serverpac_rec import PAC_REC
 
 from flcore.trainmodel.models import *
 
@@ -220,6 +221,12 @@ def run(args):
 
         elif args.algorithm == "APFL":
             server = APFL(args, i)
+            
+        elif args.algorithm == "Pac_Rec":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = PAC_REC(args, i)
 
         elif args.algorithm == "FedPer":
             args.head = copy.deepcopy(args.model.fc)
