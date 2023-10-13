@@ -20,12 +20,12 @@ class Recon(Server):
         # self.load_model()
         self.Budget = []
         self.network = self.clients[0].model.cuda()
+        
+        #recon
         self.layers_dict = self.clients[0].get_layers() #_get_layers
         self.layers_name = list(self.layers_dict.keys())
         self.grad_dims = self.clients[0].get_grad_dims()
         self.layer_wise_angle = OrderedDict()
-        self.initilize_grads()
-        
         self.S_score = OrderedDict()
         for name in self.layers_name:
             self.S_score[name] = 0
@@ -36,6 +36,8 @@ class Recon(Server):
         #self.mini_rounds = 30
         self.top_k = args.top_k
             
+        self.initilize_grads()
+        
     def initilize_grads(self):
         """
         Initialize the gradients. Need to be called before every training iteration.
@@ -44,7 +46,7 @@ class Recon(Server):
 
     def train(self):
         for i in range(self.mini_rounds+1):
-            grad_all = []
+            grad_all = [] #recon
             s_t = time.time()
             self.selected_clients = self.select_clients()
             self.send_models()
