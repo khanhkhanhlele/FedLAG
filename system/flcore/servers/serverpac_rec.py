@@ -1,4 +1,4 @@
-from flcore.clients.clientpac import clientPAC
+from flcore.clients.clientpac_rec import clientPAC_REC
 from flcore.servers.serverbase import Server
 from utils.data_utils import read_client_data
 from threading import Thread
@@ -17,7 +17,7 @@ class PAC_REC(Server):
 
         # select slow clients
         self.set_slow_clients()
-        self.set_clients(clientPAC)
+        self.set_clients(clientPAC_REC)
 
         print(f"\nJoin ratio / total clients: {self.join_ratio} / {self.num_clients}")
         print("Finished creating server and clients.")
