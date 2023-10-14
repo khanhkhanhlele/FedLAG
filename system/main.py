@@ -376,6 +376,8 @@ if __name__ == "__main__":
     parser.add_argument('-bnpc', "--batch_num_per_client", type=int, default=2)
     parser.add_argument('-nnc', "--num_new_clients", type=int, default=0)
     parser.add_argument('-fte', "--fine_tuning_epoch", type=int, default=0)
+    parser.add_argument('-fceal', "--force_evaluate", action='store_true')
+    
     # practical
     parser.add_argument('-cdr', "--client_drop_rate", type=float, default=0.0,
                         help="Rate for clients that train but drop out")
