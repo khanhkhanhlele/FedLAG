@@ -57,9 +57,9 @@ def generate_dataset(dir_path, num_clients, num_classes, niid, balance, partitio
         os.makedirs(dir_path)
         
     # Setup directory for train/test data
-    config_path = dir_path + f"{num_clients}/config.json"
-    train_path = dir_path + f"{num_clients}/train/"
-    test_path = dir_path + f"{num_clients}/test/"
+    config_path = dir_path + f"/{num_clients}/config.json"
+    train_path = dir_path + f"/{num_clients}/train/"
+    test_path = dir_path + f"/{num_clients}/test/"
 
     if check(config_path, train_path, test_path, num_clients, num_classes, niid, balance, partition):
         return
