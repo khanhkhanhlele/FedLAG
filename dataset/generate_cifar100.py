@@ -72,7 +72,7 @@ if __name__ == "__main__":
     niid = True if sys.argv[1] == "noniid" else False
     balance = True if sys.argv[2] == "balance" else False
     partition = sys.argv[3] if sys.argv[3] != "-" else None
-    num_clients = int(sys.argv[4]) if sys.argv[3] else 20
+    num_clients = int(sys.argv[4]) if sys.argv[4] else 20
     
 
     generate_cifar100(dir_path, num_clients, num_classes, niid, balance, partition)

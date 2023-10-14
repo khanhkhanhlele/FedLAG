@@ -10,7 +10,7 @@ from utils.dataset_utils import check, separate_data, split_data, save_file
 
 random.seed(1)
 np.random.seed(1)
-num_clients = 20
+# num_clients = 20
 num_classes = 10
 dir_path = "mnist/"
 
@@ -77,5 +77,6 @@ if __name__ == "__main__":
     niid = True if sys.argv[1] == "noniid" else False
     balance = True if sys.argv[2] == "balance" else False
     partition = sys.argv[3] if sys.argv[3] != "-" else None
+    num_clients = int(sys.argv[4]) if sys.argv[4] else 20
 
     generate_mnist(dir_path, num_clients, num_classes, niid, balance, partition)
