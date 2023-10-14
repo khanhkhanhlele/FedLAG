@@ -13,10 +13,14 @@ if __name__ == "__main__":
     nc = sweep_data["-nc"]
     go = sweep_data["-go"]
     
+    gpu_count = torch.cuda.device_count()
+    gpus = range(gpu_count)
+    
     for _ds in ds:
         cmd_lst = []
         run_file = os.getcwd() + f"/{_ds['name']}.sh"
         first_cmd = True
+        gpu = random.choice(gpus)
         for _nc in nc:
             if first_cmd:
                 prefix = ""
@@ -33,10 +37,10 @@ if __name__ == "__main__":
             cmd_lst += block_data_cmd
             
             for _algo in algo:
-                for _model in 
-                cmd_lst.append(
-                    f"python -u main.py -lbs 16 -nc {_nc} -jr 1 -data {_ds['name']} -nb {_ds['#cls']} -m {_ds['-m']} -algo {_algo} -gr {nc[_nc]} -did 0 -bt 0.001 -go train\n"
-                )
+                for _model in _ds['-m']:
+                    cmd_lst.append(
+                        f"python -u main.py -lbs 16 -nc {_nc} -jr 1 -data {_ds['name']} -nb {_ds['#cls']} -m {_model} -algo {_algo} -gr {nc[_nc]} -did 0 -bt 0.001 -go train -fceal -did {gpu}\n"
+                    )
             cmd_lst.append("\n")
         
         with open(run_file, mode='w') as file:

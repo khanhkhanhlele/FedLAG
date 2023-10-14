@@ -26,7 +26,10 @@ class PerAvg(Server):
             if i%self.eval_gap == 0:
                 print(f"\n-------------Round number: {i}-------------")
                 print("\nEvaluate global model with one step update")
-                self.evaluate_one_step()
+                if self.args.force_evaluate:
+                    self.evaluate()
+                else:
+                    self.evaluate_one_step()
 
             # choose several clients to send back upated model to server
             for client in self.selected_clients:

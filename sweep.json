@@ -24,6 +24,12 @@
             "#cls" : 4,
             "-m" : ["Transformer"],
             "gen" : "generate_agnews.py"
+        },
+        {
+            "name" : "Tiny-imagenet",
+            "#cls" : 20,
+            "-m" : ["cnn20", "alexnet"],
+            "gen" : "generate_tiny_imagenet.py"
         }
     ],
     "-nc" : {
@@ -32,6 +38,5 @@
         "60" : 400,
         "80" : 800,
         "100" : 1600
-    },
-    "-go" : ["train"]
+    }
 }
