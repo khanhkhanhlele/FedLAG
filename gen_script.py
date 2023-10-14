@@ -1,6 +1,7 @@
 import os 
 import json
 from random import randint 
+import random
 import torch
 
 if __name__ == "__main__":
@@ -11,7 +12,6 @@ if __name__ == "__main__":
     algo = sweep_data["-algo"] 
     ds = sweep_data["-data"]
     nc = sweep_data["-nc"]
-    go = sweep_data["-go"]
     
     gpu_count = torch.cuda.device_count()
     gpus = range(gpu_count)
@@ -49,6 +49,10 @@ if __name__ == "__main__":
     #         )
     #         file.close()
     
+    script_folder = os.getcwd() + "/scripts"
+    if not os.path.exists(script_folder):
+        os.mkdir(script_folder)
+    
     
     for _ds in ds:
         
@@ -56,9 +60,9 @@ if __name__ == "__main__":
             
             gpu = random.choice(gpus)
             
-            cmd_lst = ["cd system/"]
+            cmd_lst = ["cd ../system/\n"]
             
-            run_file = os.getcwd() + f"/{_ds['name']}_{_algo}.sh"
+            run_file = script_folder + f"/{_ds['name']}_{_algo}.sh"
             
             for _nc in nc:
                 for _model in _ds['-m']:
