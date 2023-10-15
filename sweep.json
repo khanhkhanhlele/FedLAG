@@ -27,8 +27,8 @@
         },
         {
             "name" : "Tiny-imagenet",
-            "#cls" : 20,
-            "-m" : ["cnn20", "alexnet"],
+            "#cls" : 200,
+            "-m" : ["alexnet"],
             "gen" : "generate_tiny_imagenet.py"
         }
     ],
