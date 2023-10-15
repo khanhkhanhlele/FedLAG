@@ -5,7 +5,7 @@ import torch
 
 def read_data(dataset, idx, is_train=True, num_clients=None):
     if is_train:
-        train_data_dir = os.path.join('../dataset', dataset, num_clients, 'train/')
+        train_data_dir = os.path.join('../dataset', dataset, str(num_clients), 'train/')
 
         train_file = train_data_dir + str(idx) + '.npz'
         with open(train_file, 'rb') as f:
@@ -14,7 +14,7 @@ def read_data(dataset, idx, is_train=True, num_clients=None):
         return train_data
 
     else:
-        test_data_dir = os.path.join('../dataset', dataset, num_clients, 'test/')
+        test_data_dir = os.path.join('../dataset', dataset, str(num_clients), 'test/')
 
         test_file = test_data_dir + str(idx) + '.npz'
         with open(test_file, 'rb') as f:
