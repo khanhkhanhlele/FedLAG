@@ -167,3 +167,4 @@ system/runs/
 system/wandb/
 dataset/
 *.csv
+*.pdf

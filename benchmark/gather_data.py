@@ -21,6 +21,7 @@ if __name__ == "__main__":
         "algo" : [],
         "ds" : [],
         "user" : [],
+        "rounds" : [],
         "train_loss" : [],
         "test_acc" : [],
         "test_auc_std" : [],
@@ -32,7 +33,8 @@ if __name__ == "__main__":
         "Cifar100" : "Cifar100",
         "Cifar10" : "Cifar10",
         "mnist" : "MNIST",
-        "agnews" : "Agnews"
+        "agnews" : "Agnews",
+        "Tiny-imagenet" : "Tiny-Imagenet"
     }
     
     for run_file in tqdm(runs_files):
@@ -45,7 +47,11 @@ if __name__ == "__main__":
         
         log.Reload()
         
-        if len(log.Scalars("charts/test_acc")) < max_len:
+        available_keys = log.Tags()['scalars']
+        if "charts/test_acc" not in available_keys:
+            continue
+    
+        elif len(log.Scalars("charts/test_acc")) < max_len:
             continue
         
         for key in ["train_loss", "test_acc", "test_auc", "test_acc_std", "test_auc_std"]:
@@ -55,6 +61,7 @@ if __name__ == "__main__":
         ex_dct['algo'] += [algo]*max_len
         ex_dct['ds'] += [ds_map[ds]]*max_len
         ex_dct['user'] += [user_cnt]*max_len
+        ex_dct['rounds'] += range(max_len)
     
     plot_data_dir = os.getcwd() + "/results_plot"
     if not os.path.exists(plot_data_dir):
