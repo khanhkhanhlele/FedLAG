@@ -13,7 +13,7 @@ random.seed(1)
 np.random.seed(1)
 # num_clients = 20
 num_classes = 200
-dir_path = "Tiny-imagenet"
+dir_path = "Tiny-imagenet/"
 
 # http://cs231n.stanford.edu/tiny-imagenet-200.zip
 # https://github.com/QinbinLi/MOON/blob/6c7a4ed1b1a8c0724fa2976292a667a828e3ff5d/datasets.py#L148
