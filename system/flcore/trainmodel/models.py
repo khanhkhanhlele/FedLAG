@@ -288,6 +288,117 @@ class FedAvgCNN20(nn.Module):
         out = self.fc(out)
         return out
 
+class FedAvgCNN20_Tiny(nn.Module):
+    def __init__(self, in_features, num_classes,dim=0):
+        super().__init__()
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(in_features, 32, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 32, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        self.conv2 = nn.Sequential(
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+        self.conv3 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.conv4 = nn.Sequential(
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        self.fc1 = nn.Sequential(
+            nn.Linear(4096, 1024),
+            nn.ReLU(inplace=True)
+        )
+        self.fc = nn.Linear(1024, num_classes)
+
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.conv2(out)
+        out = self.conv3(out)
+        out = self.conv4(out)
+        out = out.view(out.size(0), -1)
+        out = self.fc1(out)
+        out = self.fc(out)
+        return out
+    
+# Custom Resnet18
+class BasicBlock(nn.Module):
+    def __init__(self, channel_num):
+        super(BasicBlock, self).__init__()
+        self.conv_block1 = nn.Sequential(
+			nn.Conv2d(channel_num, channel_num, 3, padding=1),
+			# nn.BatchNorm2d(channel_num),
+			nn.ReLU(),
+		)
+        self.conv_block2 = nn.Sequential(
+			nn.Conv2d(channel_num, channel_num, 3, padding=1),
+			# nn.BatchNorm2d(channel_num),
+		)
+        self.relu = nn.ReLU()
+        torch.nn.init.kaiming_normal_(self.conv_block1[0].weight)
+        torch.nn.init.kaiming_normal_(self.conv_block2[0].weight)
+        
+    def forward(self, x):
+        residual = x
+        x = self.conv_block1(x)
+        x = self.conv_block2(x)
+        x = x + residual
+        out = self.relu(x)
+        return out
+
+class CustomResNet(nn.Module):
+    def __init__(self, in_channels = 3, type = 18, num_classes = 9):
+        super(CustomResNet, self).__init__()
+        self.struc_dict = {
+            18: {
+                "num_channels" : [64, 128, 256, 512],
+                "counts" : [2, 2, 2, 2]
+            }
+        }
+        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=64, kernel_size=7, stride=2)
+        torch.nn.init.kaiming_normal_(self.conv1.weight)
+        self.max1 = nn.MaxPool2d(kernel_size=3, stride=2)
+        self.main = nn.Sequential()
+        for idx, struc in enumerate(
+            zip(
+                self.struc_dict[type]["num_channels"], 
+                self.struc_dict[type]["counts"]
+            )
+        ):
+            num_channel, cnt = struc
+            for i in range(cnt):
+                self.main.add_module(f"conv{idx+1}_{i}", BasicBlock(num_channel))
+            if idx < len(self.struc_dict[type]["num_channels"]) - 1:
+                self.main.add_module(f"ext_{idx}", nn.Conv2d(num_channel, self.struc_dict[type]["num_channels"][idx+1], 3, 1))
+                # self.main.add_module(f"extbn_{idx}", nn.BatchNorm2d(self.struc_dict[type]["num_channels"][idx+1]))
+                                     
+        self.avg = nn.AdaptiveAvgPool2d((1))
+        self.fc = nn.Linear(self.struc_dict[type]["num_channels"][-1], num_classes)
+        torch.nn.init.kaiming_normal_(self.fc.weight)
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.max1(x)
+        x = self.main(x)
+        x = self.avg(x)
+        x = x.reshape(x.shape[0], -1)
+        x = self.fc(x)
+        return x
 
 # ====================================================================================================================
 
