@@ -19,7 +19,8 @@ class Recon(Server):
 
         # self.load_model()
         self.Budget = []
-        self.network = self.clients[0].model.cuda()
+        self.device = args.device
+        self.network = self.clients[0].model.to(args.device)
         
         #recon
         self.layers_dict = self.clients[0].get_layers() #_get_layers
@@ -42,7 +43,7 @@ class Recon(Server):
         """
         Initialize the gradients. Need to be called before every training iteration.
         """
-        self.grads = torch.zeros(sum(self.grad_dims), self.num_join_clients).cuda()
+        self.grads = torch.zeros(sum(self.grad_dims), self.num_join_clients).to(self.device)
 
     def train(self):
         for i in range(self.mini_rounds+1):
