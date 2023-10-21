@@ -25,7 +25,7 @@ if __name__ == "__main__":
     res_gr_df = pd.read_csv(benchmark_file)
     
     for ds_key, ds_name in zip(
-        ['Cifar10', 'Cifar100', 'Mnist', 'Agnews'],
+        ['Cifar10', 'Cifar100', 'MNIST', 'Agnews'],
         ['cifar10', 'cifar100', 'mnist', 'agnews']
     ):
 
