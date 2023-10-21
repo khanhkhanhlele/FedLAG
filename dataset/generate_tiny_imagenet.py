@@ -52,16 +52,16 @@ class ImageFolder_custom(DatasetFolder):
 
 
 # Allocate data to users
-def generate_dataset(dir_path, num_clients, num_classes, niid, balance, partition):
+def generate_dataset(dir_path, num_clients, num_classes, niid, balance, partition, alpha):
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
         
     # Setup directory for train/test data
-    config_path = dir_path + f"/{num_clients}/config.json"
-    train_path = dir_path + f"/{num_clients}/train/"
-    test_path = dir_path + f"/{num_clients}/test/"
+    config_path = dir_path + f"{num_clients}/{balance}_{niid}_{alpha}/config.json"
+    train_path = dir_path + f"{num_clients}/{balance}_{niid}_{alpha}/train/"
+    test_path = dir_path + f"{num_clients}/{balance}_{niid}_{alpha}/test/"
 
-    if check(config_path, train_path, test_path, num_clients, num_classes, niid, balance, partition):
+    if check(config_path, train_path, test_path, num_clients, num_classes, alpha, niid, balance, partition):
         return
 
     # Get data
@@ -95,11 +95,11 @@ def generate_dataset(dir_path, num_clients, num_classes, niid, balance, partitio
     #     idx = dataset_label == i
     #     dataset.append(dataset_image[idx])
 
-    X, y, statistic = separate_data((dataset_image, dataset_label), num_clients, num_classes, 
-                                    niid, balance, partition)
+    X, y, statistic = separate_data((dataset_image, dataset_label), num_clients, num_classes, alpha, niid, balance, partition)
+    
     train_data, test_data = split_data(X, y)
-    save_file(config_path, train_path, test_path, train_data, test_data, num_clients, num_classes, 
-        statistic, niid, balance, partition)
+    
+    save_file(config_path, train_path, test_path, train_data, test_data, num_clients, num_classes, statistic, alpha, niid, balance, partition)
 
 
 if __name__ == "__main__":
@@ -107,6 +107,7 @@ if __name__ == "__main__":
     balance = True if sys.argv[2] == "balance" else False
     partition = sys.argv[3] if sys.argv[3] != "-" else None
     num_clients = int(sys.argv[4]) if sys.argv[4] else 20
+    alpha = float(sys.argv[5]) if sys.argv[5] else 0.1
     
     rawdata_path = os.getcwd() + f"/{dir_path}/rawdata"
     if not os.path.exists(rawdata_path):
@@ -132,4 +133,4 @@ if __name__ == "__main__":
             os.chdir("..")
         print(f"Back to : {os.getcwd()}")
 
-    generate_dataset(dir_path, num_clients, num_classes, niid, balance, partition)
+    generate_dataset(dir_path, num_clients, num_classes, niid, balance, partition, alpha)
