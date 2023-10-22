@@ -28,7 +28,7 @@
         {
             "name" : "Tiny-imagenet",
             "#cls" : 200,
-            "-m" : ["resnet"],
+            "-m" : ["custom_resnet"],
             "gen" : "generate_tiny_imagenet.py"
         }
     ],

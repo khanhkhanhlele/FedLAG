@@ -105,8 +105,18 @@ def run(args):
                 # args.model = CifarNet(num_classes=args.num_classes).to(args.device)
             elif "Digit5" in args.dataset:
                 args.model = Digit5CNN().to(args.device)
+            elif "imagenet" in args.dataset:
+                args.model = FedAvgCNN20_Tiny(in_features=3, num_classes=args.num_classes).to(args.device)
             else:
                 args.model = FedAvgCNN20(in_features=3, num_classes=args.num_classes, dim=10816).to(args.device)
+        
+        elif model_str == "custom_resnet":
+            if "mnist" in args.dataset:
+                args.model = CustomResNet(in_channels=1, num_classes=args.num_classes).to(args.device)
+            elif "Cifar10" in args.dataset:
+                args.model = CustomResNet(in_channels=3, num_classes=args.num_classes).to(args.device)     
+            elif "imagenet" in args.dataset:
+                args.model = CustomResNet(in_channels=3, num_classes=args.num_classes).to(args.device)    
 
 #==========================================================================================
         elif model_str == "dnn": # non-convex
@@ -379,6 +389,10 @@ if __name__ == "__main__":
     parser.add_argument('-fceal', "--force_evaluate", action='store_true')
     parser.add_argument('-log', "--log", action='store_true')
     
+    # data
+    parser.add_argument("--noniid", action='store_true')
+    parser.add_argument('--balance', action='store_true')
+    parser.add_argument('--alpha_dirich', default=0.1, type=float)
     
     # practical
     parser.add_argument('-cdr', "--client_drop_rate", type=float, default=0.0,

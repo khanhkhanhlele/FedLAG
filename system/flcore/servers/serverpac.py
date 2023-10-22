@@ -157,8 +157,8 @@ class FedPAC(Server):
         head_weights = solve_quadratic(len(self.uploaded_ids), self.Vars, self.Hs)
 
         for idx, cid in enumerate(self.uploaded_ids):
-            print('(Client {}) Weights of Classifier Head'.format(cid))
-            print(head_weights[idx],'\n')
+            # print('(Client {}) Weights of Classifier Head'.format(cid))
+            # print(head_weights[idx],'\n')
 
             if head_weights[idx] is not None:
                 new_head = self.add_heads(head_weights[idx])
