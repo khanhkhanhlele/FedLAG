@@ -16,7 +16,7 @@ if __name__ == "__main__":
     gpu_count = torch.cuda.device_count()
     gpus = range(gpu_count)
     
-    script_folder = os.getcwd() + "/scripts"
+    script_folder = os.getcwd() + "/scripts_test"
     if not os.path.exists(script_folder):
         os.mkdir(script_folder)
     
@@ -31,11 +31,13 @@ if __name__ == "__main__":
             
             run_file = script_folder + f"/{_ds['name']}_{_algo}.sh"
             
-            for _nc in nc:
-                for _model in _ds['-m']:
-                    cmd_lst.append(
-                        f"python -u main.py -lbs 16 -nc {_nc} -jr 1 -data {_ds['name']} -nb {_ds['#cls']} -m {_model} -algo {_algo} -gr {nc[_nc]} -did 0 -bt 0.001 -go train -fceal --log --noniid -did {gpu}\n"
-                    )
+            for _case in ["--balance", "--noniid"]:
+                for _alpha in [0.1, 1, 10]:
+                    for _nc in nc:
+                        for _model in _ds['-m']:
+                            cmd_lst.append(
+                                f"python -u main.py -lbs 16 -nc {_nc} -jr 1 -data {_ds['name']} -nb {_ds['#cls']} -m {_model} -algo {_algo} -gr {nc[_nc]} -bt 0.001 -go train -fceal --log {_case} --alpha_dirich {_alpha} -did {gpu}\n"
+                            )
             
             with open(run_file, mode='w') as file:
                 file.writelines(

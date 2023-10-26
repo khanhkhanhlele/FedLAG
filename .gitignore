@@ -165,7 +165,12 @@ results/
 system/models/
 system/runs/
 system/wandb/
-dataset/
+dataset/Cifar10
+dataset/Cifar100
+dataset/mnist
+dataset/Tiny-imagenet
+dataset/emnist/
 *.csv
 *.pdf
 *.zip
+assign.py

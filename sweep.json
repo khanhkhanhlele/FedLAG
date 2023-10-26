@@ -20,16 +20,10 @@
             "gen" : "generate_mnist.py"
         },
         {
-            "name" : "agnews",
-            "#cls" : 4,
-            "-m" : ["Transformer"],
-            "gen" : "generate_agnews.py"
-        },
-        {
-            "name" : "Tiny-imagenet",
-            "#cls" : 200,
-            "-m" : ["custom_resnet"],
-            "gen" : "generate_tiny_imagenet.py"
+            "name" : "emnist",
+            "#cls" : 62,
+            "-m" : ["cnn"],
+            "gen" : "generate_mnist.py"
         }
     ],
     "-nc" : {
