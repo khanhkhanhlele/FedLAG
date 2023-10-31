@@ -42,7 +42,12 @@ if __name__ == "__main__":
     
     for run in tqdm(runs):
         run_name = run.name
-        if run.state == "finished":            
+        if run.state not in ["killed", "failed", "crashed"]:            
+            if "old" in run.Tags:
+                continue
+            if run.config["noniid"] != True:
+                continue
+            
             algo, ds, user_cnt, _ = run_name.split("__")
             
             if ds in ds_map:
