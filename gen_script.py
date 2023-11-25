@@ -2,7 +2,7 @@ import os
 import json
 from random import randint 
 import random
-import torch
+#import torch
 
 if __name__ == "__main__":
     sweep_file = os.getcwd() + "/sweep.json"
@@ -13,8 +13,8 @@ if __name__ == "__main__":
     ds = sweep_data["-data"]
     nc = sweep_data["-nc"]
     
-    gpu_count = torch.cuda.device_count()
-    gpus = range(gpu_count)
+    #gpu_count = torch.cuda.device_count()
+    #gpus = range(gpu_count)
     
     script_folder = os.getcwd() + "/scripts_test"
     if not os.path.exists(script_folder):
@@ -25,7 +25,8 @@ if __name__ == "__main__":
         
         for _algo in algo:
             
-            gpu = random.choice(gpus)
+            #gpu = random.choice(gpus)
+            gpu = 1
             
             cmd_lst = ["cd ../system/\n"]
             
