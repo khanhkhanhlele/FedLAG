@@ -6,7 +6,7 @@ import random
 import itertools
 
 if __name__ == "__main__":
-    sweep_path = "/7.2.1" #change swepp_path for each experiment
+    sweep_path = "/7.2.2" #change swepp_path for each experiment
     sweep_file = os.getcwd() + "/experiment" + sweep_path + ".json"
     
     sweep_data = json.load(open(sweep_file, mode='r'))
