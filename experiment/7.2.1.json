@@ -1,5 +1,5 @@
 {   
-    "-algo" : [ "FedPAC", "FedRod", "Pac_Rec", "Rod_Rec"],
+    "-algo" : [ "FedPAC", "FedROD", "Pac_Rec", "Rod_Rec"],
     "-data" : [
         {
             "name" : "Cifar10",

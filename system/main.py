@@ -35,6 +35,7 @@ from flcore.servers.serverbabu_rec import BABU_REC
 from flcore.servers.serverapple import APPLE
 from flcore.servers.servergen import FedGen
 from flcore.servers.serverscaffold import SCAFFOLD
+from flcore.servers.serverscaffold_rec import SCAFFOLD_REC
 from flcore.servers.serverdistill import FedDistill
 from flcore.servers.serverala import FedALA
 from flcore.servers.serverpac_rec import PAC_REC
@@ -320,6 +321,9 @@ def run(args):
 
         elif args.algorithm == "SCAFFOLD":
             server = SCAFFOLD(args, i)
+        
+        elif args.algorithm == "SCAFFOLD_Rec":
+            server = SCAFFOLD_REC(args, i)
 
         elif args.algorithm == "FedDistill":
             server = FedDistill(args, i)
