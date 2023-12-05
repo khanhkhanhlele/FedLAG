@@ -12,18 +12,6 @@
             "#cls" : 100,
             "-m" : ["cnn20"],
             "gen" : "generate_cifar100.py"
-        },
-        {
-            "name" : "mnist",
-            "#cls" : 10,
-            "-m" : ["dnn"],
-            "gen" : "generate_mnist.py"
-        },
-        {
-            "name" : "emnist",
-            "#cls" : 62,
-            "-m" : ["cnn"],
-            "gen" : "generate_mnist.py"
         }
     ],
     "-nc" : {
