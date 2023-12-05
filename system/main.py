@@ -13,8 +13,10 @@ from flcore.servers.serveravg import FedAvg
 from flcore.servers.serverrecon import Recon
 from flcore.servers.serverflame import FLAME
 from flcore.servers.serverpFedMe import pFedMe
+from flcore.servers.serverpFedMe_Rec import pFedMe_Rec
 from flcore.servers.serverperavg import PerAvg
 from flcore.servers.serverprox import FedProx
+from flcore.servers.serverprox_rec import Prox_Rec
 from flcore.servers.serverfomo import FedFomo
 from flcore.servers.serveramp import FedAMP
 from flcore.servers.servermtl import FedMTL
@@ -22,6 +24,7 @@ from flcore.servers.serverlocal import Local
 from flcore.servers.serverper import FedPer
 from flcore.servers.serverapfl import APFL
 from flcore.servers.serverditto import Ditto
+from flcore.servers.serverditto_rec import Ditto_Rec
 from flcore.servers.serverrep import FedRep
 from flcore.servers.serverphp import FedPHP
 from flcore.servers.serverbn import FedBN
@@ -35,9 +38,11 @@ from flcore.servers.serverbabu_rec import BABU_REC
 from flcore.servers.serverapple import APPLE
 from flcore.servers.servergen import FedGen
 from flcore.servers.serverscaffold import SCAFFOLD
-from flcore.servers.serverscaffold_rec import SCAFFOLD_REC
+from flcore.servers.serverscaffold_rec import SCAFFOLD_Rec
 from flcore.servers.serverdistill import FedDistill
+from flcore.servers.serverdistill_rec import Distill_Rec
 from flcore.servers.serverala import FedALA
+from flcore.servers.serverala_rec import ALA_REC
 from flcore.servers.serverpac_rec import PAC_REC
 from flcore.servers.serverpac import FedPAC
 
@@ -222,9 +227,15 @@ def run(args):
 
         elif args.algorithm == "pFedMe":
             server = pFedMe(args, i)
+        
+        elif args.algorithm == "pFedMe_Rec":
+            server = pFedMe_Rec(args, i)
 
         elif args.algorithm == "FedProx":
             server = FedProx(args, i)
+        
+        elif args.algorithm == "Prox_Rec":
+            server = Prox_Rec(args, i)
 
         elif args.algorithm == "FedFomo":
             server = FedFomo(args, i)
@@ -255,6 +266,9 @@ def run(args):
 
         elif args.algorithm == "Ditto":
             server = Ditto(args, i)
+            
+        elif args.algorithm == "Ditto_Rec":
+            server = Ditto_Rec(args, i)
 
         elif args.algorithm == "FedRep":
             args.head = copy.deepcopy(args.model.fc)
@@ -323,13 +337,19 @@ def run(args):
             server = SCAFFOLD(args, i)
         
         elif args.algorithm == "SCAFFOLD_Rec":
-            server = SCAFFOLD_REC(args, i)
+            server = SCAFFOLD_Rec(args, i)
 
         elif args.algorithm == "FedDistill":
             server = FedDistill(args, i)
+            
+        elif args.algorithm == "Distill_Rec":
+            server = Distill_Rec(args, i)
 
         elif args.algorithm == "FedALA":
             server = FedALA(args, i)
+            
+        elif args.algorithm == "ALA_Rec":
+            server = ALA_REC(args, i)
             
         else:
             raise NotImplementedError

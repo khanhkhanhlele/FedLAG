@@ -1,5 +1,5 @@
 {   
-    "-algo" : ["Recon", "PerAvg", "FedAvg", "FedROD", "FedBABU", "FedPAC"],
+    "-algo" : [ "FedBABU", "Babu_Rec",  "SCAFFOLD", "SCAFFOLD_Rec", "FedProx", "Prox_Rec", "Ditto", "Ditto_Rec"],
     "-data" : [
         {
             "name" : "Cifar10",
@@ -27,10 +27,11 @@
         }
     ],
     "-nc" : {
-        "20" : 100,
-        "40" : 200,
-        "60" : 400,
-        "80" : 600,
         "100" : 800
-    }
+    },
+    "-join_ratio": [1],
+    "-alpha" : [0.1],
+    "--top_k": [2],
+    "-sc": [0]
+
 }
