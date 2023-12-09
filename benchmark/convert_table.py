@@ -17,7 +17,7 @@ if __name__ == "__main__":
     for user in [20, 40, 60, 80, 100]:
         
         df_1 = df[df["user"] == user]
-        for algo in ["Recon", "PerAvg","FedROD", "FedPAC", "FedBABU", "FedAvg"]:
+        for algo in ["FedLAG", "PerAvg","FedROD", "FedPAC", "FedBABU", "FedAvg"]:
             
             df_2 = df_1[df_1["algo"] == algo]
             arr= np.array([algo])

@@ -19,7 +19,7 @@ if __name__ == "__main__":
     
     for _ds in tqdm(ds_lst):
         _ds_df = res_df[res_df['ds'] == _ds]
-        
+        _ds = _ds.lower()
         ds_plot_dir = bm_plot_dir + f"/{_ds}"
         if not os.path.exists(ds_plot_dir):
             os.mkdir(ds_plot_dir)

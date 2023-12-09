@@ -49,7 +49,8 @@ if __name__ == "__main__":
                 continue
             
             algo, ds, user_cnt, _ = run_name.split("__")
-            
+            if(algo == "Recon"):
+                algo = "FedLAG"
             if ds in ds_map:
                 max_len = run_len_map[user_cnt]
                 history = run.scan_history()
