@@ -1,0 +1,23 @@
+{   
+    "-algo" : ["Recon", "PerAvg", "FedAvg", "FedROD", "FedBABU", "FedPAC"],
+    "-data" : [
+        {
+            "name" : "emnist",
+            "#cls" : 62,
+            "-m" : ["cnn"],
+            "gen" : "generate_mnist.py"
+        }
+    ],
+    "-nc" : {
+        "20" : 100,
+        "40" : 200,
+        "60" : 400,
+        "80" : 600,
+        "100" : 800
+    },
+    "-alpha" : [0.1, 1, 10],
+    "-join_ratio": [1],
+    "--top_k": [2],
+    "-sc": [0]
+
+}

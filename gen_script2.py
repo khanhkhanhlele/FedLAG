@@ -6,7 +6,8 @@ import random
 import itertools
 
 if __name__ == "__main__":
-    sweep_file = os.getcwd() + "/sweep.json"
+    json_file = "/sweep_fedpac.json"
+    sweep_file = os.getcwd() + json_file
     
     sweep_data = json.load(open(sweep_file, mode='r'))
     

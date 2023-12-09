@@ -13,6 +13,7 @@ if __name__ == "__main__":
     results_plot_data = os.getcwd() + "/results_plot/benchmark.csv"
     df = pd.read_csv(results_plot_data)
     table = np.empty((0,14))
+    table = np.append(table,[columns],axis=0)
     for user in [20, 40, 60, 80, 100]:
         
         df_1 = df[df["user"] == user]
