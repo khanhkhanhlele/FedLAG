@@ -7,6 +7,8 @@ from tqdm import tqdm
 from itertools import product
 sns.set_theme(style="darkgrid")
 
+# phần này dùng để vẽ biểu đồ so sánh các phương pháp + LAG trong mục ablation
+
 if __name__ == "__main__":
     results_plot_data = os.getcwd() + "/results_plot/plot_data.csv"
     res_df = pd.read_csv(results_plot_data)
@@ -30,7 +32,7 @@ if __name__ == "__main__":
         "ds": ["Cifar10"],
         "user": [100],
         "alpha": [0.1]
-    }
+        }
         
     for _ds, _user, _alpha in product(*script.values()):
         res_df_tmp = res_df[(res_df["ds"] == _ds) & (res_df["user"] == _user) & (res_df["alpha"] == _alpha)]

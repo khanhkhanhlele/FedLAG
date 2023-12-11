@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-
+# lưu các kết quả cao nhất của các case
 if __name__ == "__main__":
     results_plot_data = os.getcwd() + "/results_plot/plot_data.csv"
     res_df = pd.read_csv(results_plot_data)
