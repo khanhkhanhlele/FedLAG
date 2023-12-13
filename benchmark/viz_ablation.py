@@ -13,7 +13,7 @@ if __name__ == "__main__":
     results_plot_data = os.getcwd() + "/results_plot/plot_data.csv"
     res_df = pd.read_csv(results_plot_data)
     
-    bm_plot_dir = results_plot_data = os.getcwd() + "/results_plot/viz_ablation"
+    bm_plot_dir = results_plot_data = os.getcwd() + "/results_plot/benchmark_plot"
     if not os.path.exists(bm_plot_dir):
         os.mkdir(bm_plot_dir)
     
@@ -37,17 +37,20 @@ if __name__ == "__main__":
     for _ds, _user, _alpha in product(*script.values()):
         res_df_tmp = res_df[(res_df["ds"] == _ds) & (res_df["user"] == _user) & (res_df["alpha"] == _alpha)]
         
-        ds_plot_dir = bm_plot_dir + f"/{_ds}_{_user}_{_alpha}.pdf"
+        # ds_plot_dir = bm_plot_dir + f"/{_ds}_{_user}_{_alpha}.pdf"
+        ds_plot_dir = bm_plot_dir + f"/ablation.pdf"
 
         
         for idx, (algo1, algo2) in enumerate(algo_lst):
             # change name
             if "_Rec" in algo2:
                 algo2_label = algo1 + "+LAG"
-            sns.lineplot(x="rounds", y="test_acc", data=res_df_tmp[res_df_tmp['algo'] == algo1], label=algo1, color=colors[idx], linestyle='-')
-            sns.lineplot(x="rounds", y="test_acc", data=res_df_tmp[res_df_tmp['algo'] == algo2], label=algo2_label, color=colors[idx], linestyle='--')
+            data1 = res_df_tmp[res_df_tmp['algo'] == algo1].groupby("rounds").agg({"test_acc":"max"})
+            sns.lineplot(x="rounds", y="test_acc", data=data1, label=algo1, color=colors[idx], linestyle='-')
+            data2 = res_df_tmp[res_df_tmp['algo'] == algo2].groupby("rounds").agg({"test_acc":"max"})
+            sns.lineplot(x="rounds", y="test_acc", data=data2, label=algo2_label, color=colors[idx], linestyle='--')
 
-        plt.savefig(ds_plot_dir, dpi=300, format='pdf')
+        plt.savefig(ds_plot_dir, dpi=300, format='pdf',bbox_inches='tight')
         plt.close()    
                 
           

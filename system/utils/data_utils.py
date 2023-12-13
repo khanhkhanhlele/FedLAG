@@ -7,8 +7,8 @@ data_path = '../dataset'
 
 def read_data(dataset, idx, niid, balance, alpha, is_train=True, num_clients=None):
     if is_train:
-        # train_data_dir = os.path.join(data_path, dataset, str(num_clients), f"{balance}_{niid}_{alpha}", 'train/')
-        train_data_dir = os.path.join(data_path, dataset, "100", f"{balance}_{niid}_{alpha}", 'train/')
+        train_data_dir = os.path.join(data_path, dataset, str(num_clients), f"{balance}_{niid}_{alpha}", 'train/')
+        # train_data_dir = os.path.join(data_path, dataset, "100", f"{balance}_{niid}_{alpha}", 'train/')
 
         train_file = train_data_dir + str(idx) + '.npz'
         with open(train_file, 'rb') as f:
@@ -17,8 +17,8 @@ def read_data(dataset, idx, niid, balance, alpha, is_train=True, num_clients=Non
         return train_data
 
     else:
-        # test_data_dir = os.path.join(data_path, dataset, str(num_clients), f"{balance}_{niid}_{alpha}", 'test/')
-        test_data_dir = os.path.join(data_path, dataset, "100", f"{balance}_{niid}_{alpha}", 'test/')
+        test_data_dir = os.path.join(data_path, dataset, str(num_clients), f"{balance}_{niid}_{alpha}", 'test/')
+        # test_data_dir = os.path.join(data_path, dataset, "100", f"{balance}_{niid}_{alpha}", 'test/')
 
         test_file = test_data_dir + str(idx) + '.npz'
         with open(test_file, 'rb') as f:
