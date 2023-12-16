@@ -149,7 +149,10 @@ class Recon(Server):
         
         print('-'*30)
         print(self.S_score)
+        print('-'*30)
+        
         top_k_items = sorted(self.S_score.items(), key=lambda x: x[1], reverse=True)[:self.top_k]
+        # top_k_items = sorted(self.S_score.items(), key=lambda x: x[1], reverse=True)[-6:-2]
         top_k_layer = [key for key, _ in top_k_items]
         print( top_k_layer)
         print('-'*30)
