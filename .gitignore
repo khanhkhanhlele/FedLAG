@@ -174,3 +174,4 @@ dataset/emnist/
 *.pdf
 *.zip
 assign.py
+wandb/

@@ -2,7 +2,7 @@ import os
 import wandb
 from glob import glob
 import shutil
-from tqdm import tqdm
+from rich.progress import track
 import pandas as pd
 
 run_len_map = {
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         "emnist" : "EMNIST"
     }
     
-    for run in tqdm(runs):
+    for run in track(runs):
         run_name = run.name
         if run.state not in ["killed", "failed", "crashed"]:            
             if "old" in run.Tags:
