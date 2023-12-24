@@ -41,6 +41,7 @@ if __name__ == "__main__":
     }
     
     for run in tqdm(runs):
+        
         run_name = run.name
         if run.state not in ["killed", "failed", "crashed"]:            
             if "old" in run.Tags:
