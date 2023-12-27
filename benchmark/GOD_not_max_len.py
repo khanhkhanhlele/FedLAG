@@ -64,11 +64,11 @@ if __name__ == "__main__":
                         # "test_auc_std"
                     ]:
                         value_data = [row[f"charts/{key}"] for row in history]
-                        if len(value_data) < max_len:
-                            raise Exception("max_len")
-                        else:
-                            clip_data = value_data[:max_len]
-                            ex_dct[key] += clip_data
+                        while len(value_data) < max_len:
+                            value_data.append(value_data[-1])
+                        
+                        clip_data = value_data[:max_len]
+                        ex_dct[key] += clip_data
                         
                 except Exception as e:
                     print(f"Error: {e} - Run: {run_name}")

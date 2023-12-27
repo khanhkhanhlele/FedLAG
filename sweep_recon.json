@@ -1,0 +1,21 @@
+{   
+    "-algo" : ["Recon"],
+    "-data" : [
+        {
+            "name" : "mnist",
+            "#cls" : 10,
+            "-m" : ["dnn"],
+            "gen" : "generate_mnist.py"
+        }
+    ],
+    "-nc" : {
+        "60" : 400,
+        "80" : 600,
+        "100" : 800
+    },
+    "-alpha" : [1],
+    "-join_ratio": [1],
+    "--top_k": [2],
+    "-sc": [0]
+
+}
