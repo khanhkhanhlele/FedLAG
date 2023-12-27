@@ -6,7 +6,7 @@ import random
 import itertools
 
 if __name__ == "__main__":
-    json_file = "/sweep_recon.json"
+    json_file = "/sweep_fedpac.json"
     sweep_file = os.getcwd() + json_file
     
     sweep_data = json.load(open(sweep_file, mode='r'))
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     #gpu_count = torch.cuda.device_count()
     #gpus = range(gpu_count)
     
-    script_folder = os.getcwd() + "/scripts_test"
+    script_folder = os.getcwd() + "/scripts_test_3080"
     if not os.path.exists(script_folder):
         os.mkdir(script_folder)
     
