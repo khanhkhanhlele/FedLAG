@@ -1,5 +1,5 @@
 {   
-    "-algo" : ["Recon", "PerAvg", "FedAvg", "FedROD", "FedBABU", "FedPAC"],
+    "-algo" : ["NashFL","Recon", "PerAvg", "FedAvg", "FedROD", "FedBABU", "FedPAC"],
     "-data" : [
         {
             "name" : "Cifar10",

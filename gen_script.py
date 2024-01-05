@@ -25,7 +25,9 @@ if __name__ == "__main__":
         
         for _algo in algo:
             
-            gpu = random.choice(gpus)
+            gpu = 0
+            if(torch.cuda.is_available()):
+                gpu = random.choice(gpus)
             
             cmd_lst = ["cd ../system/\n"]
             
