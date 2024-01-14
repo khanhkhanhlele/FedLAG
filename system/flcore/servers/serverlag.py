@@ -1,18 +1,18 @@
 import time
-from flcore.clients.clientrecon import clientRecon
+from system.flcore.clients.clientlag import clientFedLag
 from flcore.servers.serverbase import Server
 from threading import Thread
 from collections import OrderedDict
 import numpy as np
 import torch
 
-class Recon(Server):
+class FedLAG(Server):
     def __init__(self, args, times):
         super().__init__(args, times)
 
         # select slow clients
         self.set_slow_clients()
-        self.set_clients(clientRecon)
+        self.set_clients(clientFedLag)
 
         print(f"\nJoin ratio / total clients: {self.join_ratio} / {self.num_clients}")
         print("Finished creating server and clients.")

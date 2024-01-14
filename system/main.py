@@ -10,7 +10,7 @@ import torchvision
 import logging
 
 from flcore.servers.serveravg import FedAvg
-from flcore.servers.serverrecon import Recon
+from system.flcore.servers.serverlag import FedLAG
 from flcore.servers.serverflame import FLAME
 from flcore.servers.serverpFedMe import pFedMe
 from flcore.servers.serverperavg import PerAvg
@@ -198,11 +198,11 @@ def run(args):
             args.model = BaseHeadSplit(args.model, args.head)
             server = FedAvg(args, i)
 
-        elif args.algorithm == "Recon":
+        elif args.algorithm == "lag":
             args.head = copy.deepcopy(args.model.fc)
             args.model.fc = nn.Identity()
             args.model = BaseHeadSplit(args.model, args.head)
-            server = Recon(args, i)
+            server = FedLAG(args, i)
         
         elif args.algorithm == "Flame":
             args.head = copy.deepcopy(args.model.fc)
@@ -455,7 +455,7 @@ if __name__ == "__main__":
     # Flame
     parser.add_argument('-cl', "--cluster", type=str, default="kmean",
                         choices=["hdbscan", "kmean", "spectral" ])
-    # Recon
+    # FedLAG
     parser.add_argument('-sc', "--s_score", type=float, default=0)
     parser.add_argument( "--top_k", type=int, default=2)
     
