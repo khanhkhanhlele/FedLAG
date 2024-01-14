@@ -1,6 +1,6 @@
 # Official Implementation of Which layers should undergo personalization in Federated Learning?
 
-
+![alt text](https://github.com/khanhkhanhlele/FL_recon/blob/main/imgs/DGA.png)
 
 # Envinronment Setup
 ```
