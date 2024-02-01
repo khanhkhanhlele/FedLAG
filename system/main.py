@@ -10,6 +10,8 @@ import torchvision
 import logging
 
 from flcore.servers.serveravg import FedAvg
+from flcore.servers.servernash_fl import NashFL
+# from flcore.servers.serverflame import FLAME
 from system.flcore.servers.serverlag import FedLAG
 from flcore.servers.serverflame import FLAME
 from flcore.servers.serverpFedMe import pFedMe
@@ -197,6 +199,12 @@ def run(args):
             args.model.fc = nn.Identity()
             args.model = BaseHeadSplit(args.model, args.head)
             server = FedAvg(args, i)
+
+        elif args.algorithm == "NashFL":
+            args.head = copy.deepcopy(args.model.fc)
+            args.model.fc = nn.Identity()
+            args.model = BaseHeadSplit(args.model, args.head)
+            server = NashFL(args, i)
 
         elif args.algorithm == "lag":
             args.head = copy.deepcopy(args.model.fc)
