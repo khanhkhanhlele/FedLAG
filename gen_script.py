@@ -42,7 +42,7 @@ if __name__ == "__main__":
             for _nc in nc:
                 for _model in _ds['-m']:
                     cmd_lst.append(
-                        f"python -u main.py -lbs 16 -nc {_nc} -jr 1 -data {_ds['name']} -nb {_ds['#cls']} -m {_model} -algo {_algo} -gr {nc[_nc]} -bt 0.001 -go train -fceal --log --balance -did {gpu}\n"
+                        f"python -u main.py -lbs 16 -nc {_nc} -jr 1 -data {_ds['name']} -nb {_ds['#cls']} -m {_model} -algo {_algo} -gr {nc[_nc]} -bt 0.001 -go train -fceal --log --balance --noniid -did {gpu}\n"
                     )
             
             with open(run_file, mode='w') as file:
