@@ -33,7 +33,7 @@ if __name__ == "__main__":
             
             run_file = script_folder + f"/{_ds['name']}_{_algo}.sh"
             
-            for _alpha in [0.1, 1, 10]:
+            for _alpha in [0.1, 1]:
                 for _nc in nc:
                     for _model in _ds['-m']:
                         cmd_lst.append(
