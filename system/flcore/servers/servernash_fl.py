@@ -144,6 +144,8 @@ class NashFL(Server):
 
         alpha = self.solve(GTG.cpu().detach().numpy())
         # alpha = torch.from_numpy(alpha)
+        alpha_sum = np.sum(alpha)
+        alpha = alpha / alpha_sum
         return alpha
     
     #update global model
