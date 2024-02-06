@@ -185,24 +185,24 @@ class NashFL(Server):
             self.selected_clients = self.select_clients()   # select clients
             
             #check parameters before send global model
-            print("parameter of a selected client before send global model")
-            for name, param in self.selected_clients[0].model.named_parameters():
-                print(name, param.data[2])
-                break
+            # print("parameter of a selected client before send global model")
+            # for name, param in self.selected_clients[0].model.named_parameters():
+            #     print(name, param.data[2])
+            #     break
             
             self.send_models()                        # send global model
 
             #print only first parameters of global model
-            print("parameters of global model before aggregate")
-            for name, param in self.global_model.named_parameters():
-                print(name, param.data[2])
-                break
+            # print("parameters of global model before aggregate")
+            # for name, param in self.global_model.named_parameters():
+            #     print(name, param.data[2])
+            #     break
             
             #check success of send global model
-            print("parameter of a selected client after send global model")
-            for name, param in self.selected_clients[0].model.named_parameters():
-                print(name, param.data[2])
-                break
+            # print("parameter of a selected client after send global model")
+            # for name, param in self.selected_clients[0].model.named_parameters():
+            #     print(name, param.data[2])
+            #     break
             
             if i%self.eval_gap == 0:
                 print(f"\n-------------Round number: {i}-------------")
@@ -212,10 +212,10 @@ class NashFL(Server):
             for client in self.selected_clients:
                 client.train()                # train selected clients
 
-            print("parameters after trainning of a selected client")
-            for name, param in self.selected_clients[0].model.named_parameters():
-                print(name, param.data[2])
-                break
+            # print("parameters after trainning of a selected client")
+            # for name, param in self.selected_clients[0].model.named_parameters():
+            #     print(name, param.data[2])
+            #     break
             
             
             self.receive_models()              # receive models from clients
@@ -228,7 +228,7 @@ class NashFL(Server):
 
             self.alpha = self.get_alpha()       # get alpha
 
-            self.check()               # check alpha
+            # self.check()               # check alpha
 
             self.aggregate_parameters_nash()        #update global model
 

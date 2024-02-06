@@ -13,7 +13,7 @@ class clientNash(Client):
         self.total_grads = [torch.zeros_like(param) for param in self.model.parameters()]
 
     def train(self):
-        print(f"Client {self.id} is training.")
+        # print(f"Client {self.id} is training.")
         trainloader = self.load_train_data()
         # self.model.to(self.device)
         self.model.train()
