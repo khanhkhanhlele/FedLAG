@@ -17,6 +17,8 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 import wandb
 
+import flcore.clients.clientbase as Client
+
 class Server(object):
     def __init__(self, args, times):
         # Set up the main attributes
@@ -42,6 +44,7 @@ class Server(object):
         self.top_cnt = 100
         self.auto_break = args.auto_break
 
+        #self.clients is a list of client objects
         self.clients = []
         self.selected_clients = []
         self.train_slow_clients = []
@@ -125,7 +128,7 @@ class Server(object):
         else:
             self.current_num_join_clients = self.num_join_clients
         selected_clients = list(np.random.choice(self.clients, self.current_num_join_clients, replace=False))
-
+        print("num client: ", len(selected_clients))
         return selected_clients
 
     def send_models(self):
@@ -300,7 +303,7 @@ class Server(object):
             self.writer.add_scalar("charts/test_auc_std", test_auc_std, self.current_round)
             wandb.log({"charts/test_auc_std": test_auc_std}, step=self.current_round)
         
-        self.current_round += 1
+            self.current_round += 1
 
     def print_(self, test_acc, test_auc, train_loss):
         print("Average Test Accurancy: {:.4f}".format(test_acc))
