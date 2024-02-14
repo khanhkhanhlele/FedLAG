@@ -44,15 +44,23 @@ class NashFL(Server):
     def get_param_grad(self):
         self.uploaded_params = []
         self.uploaded_grads = []    
+        self.global_model_params = []
+        temp_params = []
+        for param in self.global_model.parameters():
+            self.global_model_params.append(param.data.clone())
         for model in self.uploaded_models:
             temp_params = []
-            temp_grads = []
+            # print("param of client: ", param.grad.data.clone()[0])
             for param in model.parameters():
                 temp_params.append(param.data.clone())
-                temp_grads.append(param.grad.clone())
             self.uploaded_params.append(temp_params)
+            #self.uploaded_grads will append list values (temp_params - self.global_model_params)
+            temp_grads = []
+            for param, global_param in zip(temp_params, self.global_model_params):
+                temp_grads.append(param - global_param)
             self.uploaded_grads.append(temp_grads)
-
+            # print("global model params: ", self.global_model_params[0])
+            # print("uploaded_grads: ", self.uploaded_grads[-1][0])
 
     def aggregate_grads(self):
         self.grads_flatten = []
