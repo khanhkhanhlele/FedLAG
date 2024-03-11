@@ -41,6 +41,22 @@ class NashFL(Server):
         self.alpha = []
 
 
+    def receive_models_nash(self):
+        assert (len(self.selected_clients) > 0)
+        self.uploaded_ids = []
+        self.uploaded_weights =[]
+        self.uploaded_models = []
+        tot_samples = 0
+        
+        for client in self.selected_clients:
+            tot_samples += client.train_samples
+            self.uploaded_ids.append(client.id)
+            self.uploaded_weights.append(client.train_samples)
+            self.uploaded_models.append(client.model)
+            
+        for i, w in enumerate(self.uploaded_weights):
+            self.uploaded_weights[i] = w / tot_samples
+    
     def get_param_grad(self):
         self.uploaded_params = []
         self.uploaded_grads = []    
@@ -50,17 +66,16 @@ class NashFL(Server):
             self.global_model_params.append(param.data.clone())
         for model in self.uploaded_models:
             temp_params = []
-            # print("param of client: ", param.grad.data.clone()[0])
+            
             for param in model.parameters():
                 temp_params.append(param.data.clone())
             self.uploaded_params.append(temp_params)
-            #self.uploaded_grads will append list values (temp_params - self.global_model_params)
+            
             temp_grads = []
             for param, global_param in zip(temp_params, self.global_model_params):
                 temp_grads.append(param - global_param)
             self.uploaded_grads.append(temp_grads)
-            # print("global model params: ", self.global_model_params[0])
-            # print("uploaded_grads: ", self.uploaded_grads[-1][0])
+
 
     def aggregate_grads(self):
         self.grads_flatten = []
@@ -69,6 +84,7 @@ class NashFL(Server):
             self.grads_flatten.append(grad_flat)
         self.G = torch.stack(self.grads_flatten, dim=0)
 
+    #start finding alpha
     def _init_optim_problem(self):
         self.alpha_param = cp.Variable(self.current_num_join_clients, nonneg=True)
         self.prvs_alpha_param = cp.Parameter(self.current_num_join_clients, value=self.prvs_alpha)
@@ -156,6 +172,13 @@ class NashFL(Server):
         alpha = alpha / alpha_sum
         return alpha
     
+    # end finding alpha
+    
+    def weight_client (self):
+        self.alpha = self.alpha * self.uploaded_weights
+        alpha_sum = np.sum(self.alpha)
+        self.alpha  = self.alpha / alpha_sum
+        
     #update global model
     
     def aggregate_parameters_nash(self):
@@ -180,9 +203,9 @@ class NashFL(Server):
 
 
     def check(self):
-        GTG = torch.matmul(self.G, self.G.t())
-        vt = GTG @ self.alpha
-        vp = 1 / (self.alpha + 1e-10)
+        # GTG = torch.matmul(self.G, self.G.t())
+        # vt = GTG @ self.alpha
+        # vp = 1 / (self.alpha + 1e-10)
         # print("vt is ", vt)
         # print("vp is ",vp)
         print("alpha is :", self.alpha)
@@ -192,26 +215,8 @@ class NashFL(Server):
             s_t = time.time()
             self.selected_clients = self.select_clients()   # select clients
             
-            #check parameters before send global model
-            # print("parameter of a selected client before send global model")
-            # for name, param in self.selected_clients[0].model.named_parameters():
-            #     print(name, param.data[2])
-            #     break
-            
             self.send_models()                        # send global model
 
-            #print only first parameters of global model
-            # print("parameters of global model before aggregate")
-            # for name, param in self.global_model.named_parameters():
-            #     print(name, param.data[2])
-            #     break
-            
-            #check success of send global model
-            # print("parameter of a selected client after send global model")
-            # for name, param in self.selected_clients[0].model.named_parameters():
-            #     print(name, param.data[2])
-            #     break
-            
             if i%self.eval_gap == 0:
                 print(f"\n-------------Round number: {i}-------------")
                 print("\nEvaluate global model")
@@ -219,14 +224,8 @@ class NashFL(Server):
 
             for client in self.selected_clients:
                 client.train()                # train selected clients
-
-            # print("parameters after trainning of a selected client")
-            # for name, param in self.selected_clients[0].model.named_parameters():
-            #     print(name, param.data[2])
-            #     break
             
-            
-            self.receive_models()              # receive models from clients
+            self.receive_models_nash()              # receive models from clients
             if self.dlg_eval and i%self.dlg_gap == 0:
                 self.call_dlg(i)        
             
@@ -235,15 +234,12 @@ class NashFL(Server):
 
 
             self.alpha = self.get_alpha()       # get alpha
+            self.weight_client()
 
-            # self.check()               # check alpha
+            self.check()               # check alpha
 
             self.aggregate_parameters_nash()        #update global model
 
-            print("parameters after aggregate")
-            for param in self.global_model.parameters():
-                print(param.data[2])
-                break
 
             self.Budget.append(time.time() - s_t)
             print('-'*25, 'time cost', '-'*25, self.Budget[-1])
