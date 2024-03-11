@@ -214,6 +214,7 @@ class NashFL(Server):
         for i in range(self.global_rounds+1):
             s_t = time.time()
             self.selected_clients = self.select_clients()   # select clients
+            print("num of selected client: ", len(self.selected_clients))
             
             self.send_models()                        # send global model
 
