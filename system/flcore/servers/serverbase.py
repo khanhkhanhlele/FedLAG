@@ -478,3 +478,14 @@ class Server(object):
             this_grad = newgrad[beg: en].contiguous().view(param.data.size())
             param.grad = this_grad.data.clone()
             cnt += 1
+            
+            
+    ### save client model
+    def save_client_model(self,round):
+        
+        model_path = os.path.join("client_models", self.dataset)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
+        for client in self.clients:
+            client_model_path = os.path.join(model_path, self.algorithm + "_client" + str(client.id) +"_round"+ str(round) + ".pt")
+            torch.save(client.model, client_model_path)

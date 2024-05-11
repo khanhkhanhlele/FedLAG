@@ -47,6 +47,7 @@ class FedLAG(Server):
 
     def train(self):
         for i in range(self.mini_rounds+1):
+            self.save_client_model(i)
             grad_all = [] #recon
             s_t = time.time()
             self.selected_clients = self.select_clients()

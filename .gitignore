@@ -175,3 +175,6 @@ dataset/emnist/
 *.zip
 assign.py
 wandb/
+
+#save model of each client for each round
+system/client_models/
